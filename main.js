@@ -1,29 +1,66 @@
 import {createCanvas} from './Canvas.js';
 import {HexGrid} from './Grid.js';
+import {clamp} from './util.js';
 
 let canvas = createCanvas(window.innerWidth, window.innerHeight);
-let hexGrid = new HexGrid(10, 15);
-let scale = 120;
+let hexGrid = new HexGrid(10, 25);
+const viewport = {
+  leftX: 0,
+  topY: 0,
+  scale: 120,
+};
 
 console.time('initial render');
 canvas.attachToDom(document.body);
-hexGrid.render(0, 0, 10, 15, scale, canvas);
+hexGrid.render(viewport, canvas);
 console.timeEnd('initial render');
 
+// zoom map
 document.addEventListener('wheel', e => {
-  console.time('render');
-  const newScale = scale - e.deltaY * 0.25;
-  if (newScale > 20 && newScale < 300) {
-    scale = newScale;
-    hexGrid.render(0, 0, 10, 15, scale, canvas);
+  viewport.scale = clamp(
+      viewport.scale - e.deltaY * 0.25, canvas.height / hexGrid.height, 300);
+  viewport.topY =
+      clamp(viewport.topY, 0, hexGrid.height - canvas.height / viewport.scale);
+  hexGrid.render(viewport, canvas);
+});
+
+// drag map
+let dragging = false;
+let startDragX, startDragY;
+canvas.addEventListener('mousedown', ({layerX, layerY}) => {
+  dragging = true;
+  startDragX = layerX;
+  startDragY = layerY;
+});
+canvas.addEventListener('mousemove', ({layerX, layerY}) => {
+  if (dragging) {
+    const dx = (layerX - startDragX) / viewport.scale;
+    const dy = (layerY - startDragY) / viewport.scale;
+    hexGrid.render(
+        {
+          leftX: viewport.leftX - dx,
+          topY: clamp(
+              viewport.topY - dy, 0,
+              hexGrid.height - canvas.height / viewport.scale),
+          scale: viewport.scale,
+        },
+        canvas);
   }
-  console.timeEnd('render');
+});
+canvas.addEventListener('mouseup', ({layerX, layerY}) => {
+  dragging = false;
+  const dx = (layerX - startDragX) / viewport.scale;
+  const dy = (layerY - startDragY) / viewport.scale;
+  viewport.leftX -= dx;
+  viewport.topY = clamp(
+      viewport.topY - dy, 0, hexGrid.height - canvas.height / viewport.scale);
 });
 
-canvas.addEventListener('click', ({layerX, layerY}) => {
-  hexGrid.invertColor(layerX / scale, layerY / scale);
-  hexGrid.render(0, 0, 10, 15, scale, canvas);
+// right click
+canvas.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  hexGrid.invertColor(
+      e.layerX / viewport.scale + viewport.leftX,
+      e.layerY / viewport.scale + viewport.topY);
+  hexGrid.render(viewport, canvas);
 });
-
-window.canvas = canvas;
-window.hexGrid = hexGrid;

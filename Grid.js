@@ -1,4 +1,4 @@
-import {mod, rand} from './util.js';
+import {clamp, mod, rand} from './util.js';
 
 const RT3 = Math.sqrt(3);
 const RT3_INV = 1 / Math.sqrt(3);
@@ -31,7 +31,7 @@ class Tile {
     return this.data_[key];
   }
 
-  render(x, y, scale, canvas) {
+  renderTile(x, y, scale, canvas) {
     canvas.drawRect(x * scale, y * scale, scale, scale, this.get('color'));
   }
 }
@@ -41,15 +41,15 @@ class HexTile extends Tile {
     super();
   }
 
-  render(x, y, scale, canvas) {
+  renderTile(x, y, scale, canvas) {
     canvas.drawHex(x * scale, y * scale, RT3 * scale, scale, this.get('color'));
   }
 }
 
 class Grid {
   constructor(width = 0, height = 0, TileClass = Tile) {
-    this.width = width;
-    this.height = height;
+    this.tWidth = width;
+    this.tHeight = height;
     this.rows_ = new Array(height);
     for (let ty = 0; ty < height; ty++) {
       this.rows_[ty] = new Array(width);
@@ -65,11 +65,15 @@ class Grid {
   }
 
   get(tx, ty) {
-    if (0 <= ty && ty < this.height) {
+    if (0 <= ty && ty < this.tHeight) {
       return this.rows_[ty][tx];
     } else {
       return undefined;
     }
+  }
+
+  get height() {
+    return this.getCoordOffset(0, this.tHeight - 1)[1] + 1;
   }
 
   getCoordOffset(tx, ty) {
@@ -82,13 +86,14 @@ class Grid {
 
   getAdjacentIndexes(tx, ty) {
     const adj = [];
-    const leftX = mod(tx - 1, this.width);
-    const rightX = mod(tx + 1, this.width);
+    tx = mod(tx, this.tWidth);
+    const leftX = mod(tx - 1, this.tWidth);
+    const rightX = mod(tx + 1, this.tWidth);
     if (ty > 0) {
       adj.push([leftX, ty - 1], [tx, ty - 1], [rightX, ty - 1]);
     }
     adj.push([leftX, ty], [rightX, ty]);
-    if (ty + 1 < this.height) {
+    if (ty + 1 < this.tHeight) {
       adj.push([leftX, ty + 1], [tx, ty + 1], [rightX, ty + 1]);
     }
     return adj;
@@ -104,6 +109,7 @@ class Grid {
 
   invertColor(x, y) {
     const tileIndex = this.coordsToTileIndex(x, y);
+    tileIndex[0] = mod(tileIndex[0], this.tWidth);
     const nbrIndexes = this.getAdjacentIndexes(tileIndex[0], tileIndex[1]);
     for (const index of [tileIndex, ...nbrIndexes]) {
       const tile = this.get(index[0], index[1]);
@@ -150,16 +156,22 @@ export class HexGrid extends Grid {
                             [RT3 * tx + RT3_2, 0.75 * (ty - 1) + 0.75];
   }
 
-  // Renders the tiles that intersect with the rectangle:
-  // (x, y)-----------------|
-  // |                      |
-  // ----------(x + w, y + h)
-  render(topLeftX, topLeftY, w, h, scale, canvas) {
+  // viewport = {leftX, topY, scale}
+  render(viewport, canvas) {
     canvas.clear();
-    for (let ty = topLeftY; ty < topLeftY + h; ty++) {
-      for (let tx = topLeftX; tx < topLeftX + w; tx++) {
-        const [offsetX, offsetY] = this.getCoordOffset(tx, ty);
-        this.get(tx, ty).render(offsetX, offsetY, scale, canvas);
+    const topLeftIndex = this.coordsToTileIndex(viewport.leftX, viewport.topY);
+    const bottomRightIndex = this.coordsToTileIndex(
+        viewport.leftX + canvas.width / viewport.scale,
+        viewport.topY + canvas.height / viewport.scale);
+    for (let ty = topLeftIndex[1] - 1; ty <= bottomRightIndex[1] + 1; ty++) {
+      for (let tx = topLeftIndex[0] - 1; tx <= bottomRightIndex[0] + 1; tx++) {
+        const tile = this.get(mod(tx, this.tWidth), ty);
+        if (tile !== undefined) {
+          const [offsetX, offsetY] = this.getCoordOffset(tx, ty);
+          tile.renderTile(
+              offsetX - viewport.leftX, offsetY - viewport.topY, viewport.scale,
+              canvas);
+        }
       }
     }
   }
@@ -171,7 +183,7 @@ export class HexGrid extends Grid {
     let quarterRow = Math.floor(4 * y);
     const halfCol = Math.floor(RT3_2_INV * x);
     // Push points in slant rows into the appropriate box row.
-    switch (quarterRow % 6) {
+    switch (mod(quarterRow, 6)) {
       case 0:
         // slant up
         x = RT3_2_INV * x - halfCol;
@@ -194,19 +206,19 @@ export class HexGrid extends Grid {
         break;
     }
     // Now the point is in a box row, which is easier to handle.
-    switch (quarterRow % 6) {
+    switch (mod(quarterRow, 6)) {
       case 1:
       case 2:
         // box even
         return [
-          mod(halfCol, 2 * this.width) >> 1,
+          halfCol >> 1,
           2 * Math.floor(quarterRow / 6),
         ];
       case 4:
       case 5:
         // box odd
         return [
-          mod(halfCol - 1, 2 * this.width) >> 1,
+          (halfCol - 1) >> 1,
           2 * Math.floor(quarterRow / 6) + 1,
         ];
     }
@@ -214,13 +226,14 @@ export class HexGrid extends Grid {
 
   getAdjacentIndexes(tx, ty) {
     const adj = [];
-    const leftX = mod(tx - 1, this.width);
-    const rightX = mod(tx + 1, this.width);
+    tx = mod(tx, this.tWidth);
+    const leftX = mod(tx - 1, this.tWidth);
+    const rightX = mod(tx + 1, this.tWidth);
     adj.push([leftX, ty], [rightX, ty]);
     if (ty > 0) {
       adj.push([tx, ty - 1], [(ty & 1) === 0 ? leftX : rightX, ty - 1]);
     }
-    if (ty + 1 < this.height) {
+    if (ty + 1 < this.tHeight) {
       adj.push([tx, ty + 1], [(ty & 1) === 0 ? leftX : rightX, ty + 1]);
     }
     return adj;
