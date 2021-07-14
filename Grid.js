@@ -76,6 +76,10 @@ class Grid {
     return this.getCoordOffset(0, this.tHeight - 1)[1] + 1;
   }
 
+  get width() {
+    return this.getCoordOffset(this.tWidth, 0)[0];
+  }
+
   getCoordOffset(tx, ty) {
     return [tx, ty];
   }
@@ -158,22 +162,25 @@ export class HexGrid extends Grid {
 
   // viewport = {leftX, topY, scale}
   render(viewport, canvas) {
+    console.time('render');
     canvas.clear();
     const topLeftIndex = this.coordsToTileIndex(viewport.leftX, viewport.topY);
     const bottomRightIndex = this.coordsToTileIndex(
         viewport.leftX + canvas.width / viewport.scale,
         viewport.topY + canvas.height / viewport.scale);
     for (let ty = topLeftIndex[1] - 1; ty <= bottomRightIndex[1] + 1; ty++) {
+      if (ty < 0 || ty >= this.tHeight) {
+        continue;
+      }
       for (let tx = topLeftIndex[0] - 1; tx <= bottomRightIndex[0] + 1; tx++) {
         const tile = this.get(mod(tx, this.tWidth), ty);
-        if (tile !== undefined) {
-          const [offsetX, offsetY] = this.getCoordOffset(tx, ty);
-          tile.renderTile(
-              offsetX - viewport.leftX, offsetY - viewport.topY, viewport.scale,
-              canvas);
-        }
+        const [offsetX, offsetY] = this.getCoordOffset(tx, ty);
+        tile.renderTile(
+            offsetX - viewport.leftX, offsetY - viewport.topY, viewport.scale,
+            canvas);
       }
     }
+    console.timeEnd('render');
   }
 
   coordsToTileIndex(x, y) {

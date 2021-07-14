@@ -1,6 +1,6 @@
 import {createCanvas} from './Canvas.js';
 import {HexGrid} from './Grid.js';
-import {clamp} from './util.js';
+import {clamp, mod} from './util.js';
 
 let canvas = createCanvas(window.innerWidth, window.innerHeight);
 let hexGrid = new HexGrid(10, 25);
@@ -14,6 +14,12 @@ console.time('initial render');
 canvas.attachToDom(document.body);
 hexGrid.render(viewport, canvas);
 console.timeEnd('initial render');
+
+// handle window resize
+window.addEventListener('resize', () => {
+  canvas.updateDimensions(window.innerWidth, window.innerHeight);
+  hexGrid.render(viewport, canvas);
+});
 
 // zoom map
 document.addEventListener('wheel', e => {
@@ -51,7 +57,7 @@ canvas.addEventListener('mouseup', ({layerX, layerY}) => {
   dragging = false;
   const dx = (layerX - startDragX) / viewport.scale;
   const dy = (layerY - startDragY) / viewport.scale;
-  viewport.leftX -= dx;
+  viewport.leftX = mod(viewport.leftX - dx, hexGrid.width);
   viewport.topY = clamp(
       viewport.topY - dy, 0, hexGrid.height - canvas.height / viewport.scale);
 });
@@ -64,3 +70,6 @@ canvas.addEventListener('contextmenu', e => {
       e.layerY / viewport.scale + viewport.topY);
   hexGrid.render(viewport, canvas);
 });
+
+// TODO: Globe view!
+// https://blog.mastermaps.com/2013/09/creating-webgl-earth-with-threejs.html

@@ -4,6 +4,10 @@ export function createCanvas(width, height) {
   canvas.height = height;
   const ctx = canvas.getContext('2d');
   return {
+    updateDimensions(width, height) {
+      canvas.width = width;
+      canvas.height = height;
+    },
     attachToDom(container) {
       container.appendChild(canvas);
     },
@@ -11,18 +15,18 @@ export function createCanvas(width, height) {
       canvas.addEventListener(...args);
     },
     get width() {
-      return width;
+      return canvas.width;
     },
     get height() {
-      return height;
+      return canvas.height;
     },
     clear() {
       ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     },
     drawRect(x, y, w, h, color) {
       ctx.fillStyle = color;
-      ctx.fillRect(x, y, width, height)
+      ctx.fillRect(x, y, canvas.width, canvas.height);
     },
     drawHex(x, y, w, h, color) {
       ctx.fillStyle = color;
