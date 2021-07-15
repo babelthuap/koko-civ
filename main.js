@@ -1,42 +1,37 @@
-import {createCanvas} from './Canvas.js';
-import {HexGrid} from './Grid.js';
-import {clamp, mod} from './util.js';
+import {createCanvas} from './js/canvas.js';
+import {Gameboard} from './js/Gameboard.js';
+import {updateView} from './js/Renderer.js';
+import {clamp, mod} from './js/util.js';
 
 console.time('initial render');
-let canvas = createCanvas(window.innerWidth, window.innerHeight);
-let hexGrid = new HexGrid(10, 25);
-const viewport = {
+const canvas = createCanvas(window.innerWidth, window.innerHeight);
+const gameboard = new Gameboard(10, 25);
+let view = {
   leftX: 0,
   topY: 0,
   scale: 120,
 };
 
-canvas.attachToDom(document.body);
-hexGrid.render(viewport, canvas);
+document.body.appendChild(canvas);
+gameboard.render(canvas, view);
 console.timeEnd('initial render');
-
-// constrain viewport parameters
-function updateViewport({leftX, topY, scale}) {
-  viewport.leftX = mod(leftX, hexGrid.width);
-  viewport.scale = clamp(scale, canvas.height / hexGrid.height, 300);
-  viewport.topY =
-      clamp(topY, 0, hexGrid.height - canvas.height / viewport.scale);
-  hexGrid.render(viewport, canvas);
-}
 
 // handle window resize
 window.addEventListener('resize', () => {
-  canvas.updateDimensions(window.innerWidth, window.innerHeight);
-  updateViewport(viewport);
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  view = updateView(gameboard, canvas, view);
+  gameboard.render(canvas, view);
 });
 
 // zoom map
 document.addEventListener('wheel', e => {
-  updateViewport({
-    leftX: viewport.leftX,
-    topY: viewport.topY,
-    scale: viewport.scale - e.deltaY * 0.25,
+  view = updateView(gameboard, canvas, {
+    leftX: view.leftX,
+    topY: view.topY,
+    scale: view.scale - e.deltaY * 0.25,
   });
+  gameboard.render(canvas, view);
 });
 
 // drag map
@@ -49,30 +44,28 @@ document.addEventListener('mousedown', ({layerX, layerY}) => {
 });
 document.addEventListener('mousemove', ({layerX, layerY}) => {
   if (dragging) {
-    const dx = (layerX - startDragX) / viewport.scale;
-    const dy = (layerY - startDragY) / viewport.scale;
-    hexGrid.render(
-        {
-          leftX: viewport.leftX - dx,
+    const dx = (layerX - startDragX) / view.scale;
+    const dy = (layerY - startDragY) / view.scale;
+    gameboard.render(
+        canvas, updateView(gameboard, canvas, {
+          leftX: view.leftX - dx,
           topY: clamp(
-              viewport.topY - dy, 0,
-              hexGrid.height - canvas.height / viewport.scale),
-          scale: viewport.scale,
-        },
-        canvas);
+              view.topY - dy, 0, gameboard.height - canvas.height / view.scale),
+          scale: view.scale,
+        }));
   }
 });
 function finalizeDragging({layerX, layerY}) {
   if (dragging) {
-    console.log('finalizeDragging');
     dragging = false;
-    const dx = (layerX - startDragX) / viewport.scale;
-    const dy = (layerY - startDragY) / viewport.scale;
-    updateViewport({
-      leftX: viewport.leftX - dx,
-      topY: viewport.topY - dy,
-      scale: viewport.scale,
+    const dx = (layerX - startDragX) / view.scale;
+    const dy = (layerY - startDragY) / view.scale;
+    view = updateView(gameboard, canvas, {
+      leftX: view.leftX - dx,
+      topY: view.topY - dy,
+      scale: view.scale,
     });
+    gameboard.render(canvas, view);
   }
 }
 document.addEventListener('mouseup', finalizeDragging);
@@ -81,10 +74,9 @@ document.addEventListener('mouseleave', finalizeDragging);
 // right click
 document.addEventListener('contextmenu', e => {
   e.preventDefault();
-  hexGrid.invertColor(
-      e.layerX / viewport.scale + viewport.leftX,
-      e.layerY / viewport.scale + viewport.topY);
-  hexGrid.render(viewport, canvas);
+  gameboard.invertColor(
+      e.layerX / view.scale + view.leftX, e.layerY / view.scale + view.topY);
+  gameboard.render(canvas, view);
 });
 
 // TODO: Globe view!
