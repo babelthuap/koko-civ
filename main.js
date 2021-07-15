@@ -1,10 +1,11 @@
-import {createCanvas} from './js/canvas.js';
 import {Gameboard} from './js/Gameboard.js';
 import {updateView} from './js/Renderer.js';
 import {clamp, mod} from './js/util.js';
 
 console.time('initial render');
-const canvas = createCanvas(window.innerWidth, window.innerHeight);
+const canvas = document.createElement('canvas');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 const gameboard = new Gameboard(10, 25);
 let view = {
   leftX: 0,
