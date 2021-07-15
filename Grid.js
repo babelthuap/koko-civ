@@ -1,9 +1,10 @@
 import {clamp, mod, rand} from './util.js';
 
-const RT3 = Math.sqrt(3);
-const RT3_INV = 1 / Math.sqrt(3);
-const RT3_2 = RT3 / 2;
-const RT3_2_INV = 2 / RT3;
+// The width of each hex in internal coordinates. (The height is 1.)
+const HEX_WIDTH = Math.sqrt(3);
+const HEX_WIDTH_INV = 1 / HEX_WIDTH;
+const HEX_WIDTH_2 = HEX_WIDTH / 2;
+const HEX_WIDTH_2_INV = 2 / HEX_WIDTH;
 
 const OCEAN = [0x4b, 0xb8, 0xe8];
 const LAND = [0x47, 0x7e, 0x19];
@@ -42,7 +43,8 @@ class HexTile extends Tile {
   }
 
   renderTile(x, y, scale, canvas) {
-    canvas.drawHex(x * scale, y * scale, RT3 * scale, scale, this.get('color'));
+    canvas.drawHex(
+        x * scale, y * scale, HEX_WIDTH * scale, scale, this.get('color'));
   }
 }
 
@@ -156,13 +158,13 @@ export class HexGrid extends Grid {
   }
 
   getCoordOffset(tx, ty) {
-    return (ty & 1) === 0 ? [RT3 * tx, 0.75 * ty] :
-                            [RT3 * tx + RT3_2, 0.75 * (ty - 1) + 0.75];
+    return (ty & 1) === 0 ?
+        [HEX_WIDTH * tx, 0.75 * ty] :
+        [HEX_WIDTH * tx + HEX_WIDTH_2, 0.75 * (ty - 1) + 0.75];
   }
 
   // viewport = {leftX, topY, scale}
   render(viewport, canvas) {
-    console.time('render');
     canvas.clear();
     const topLeftIndex = this.coordsToTileIndex(viewport.leftX, viewport.topY);
     const bottomRightIndex = this.coordsToTileIndex(
@@ -180,7 +182,6 @@ export class HexGrid extends Grid {
             canvas);
       }
     }
-    console.timeEnd('render');
   }
 
   coordsToTileIndex(x, y) {
@@ -188,12 +189,12 @@ export class HexGrid extends Grid {
     // The behavior of this method depends on which quarter-row and half-column
     // the input point happens to be in.
     let quarterRow = Math.floor(4 * y);
-    const halfCol = Math.floor(RT3_2_INV * x);
+    const halfCol = Math.floor(HEX_WIDTH_2_INV * x);
     // Push points in slant rows into the appropriate box row.
     switch (mod(quarterRow, 6)) {
       case 0:
         // slant up
-        x = RT3_2_INV * x - halfCol;
+        x = HEX_WIDTH_2_INV * x - halfCol;
         y = 4 * y - quarterRow;
         if (((halfCol & 1) === 0) ? x + y > 1 : y > x) {
           quarterRow++;
@@ -203,7 +204,7 @@ export class HexGrid extends Grid {
         break;
       case 3:
         // slant down
-        x = RT3_2_INV * x - halfCol;
+        x = HEX_WIDTH_2_INV * x - halfCol;
         y = 4 * y - quarterRow;
         if (((halfCol & 1) === 0) ? y > x : x + y > 1) {
           quarterRow++;
