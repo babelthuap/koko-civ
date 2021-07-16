@@ -1,58 +1,10 @@
-import {clamp, limitOncePerFrame, mod, rand} from './util.js';
+import {mod} from './util.js';
 
 // The width of each hex in internal coordinates. (The height is 1.)
 const HEX_WIDTH = Math.sqrt(3);
 const HEX_WIDTH_INV = 1 / HEX_WIDTH;
 const HEX_WIDTH_2 = HEX_WIDTH / 2;
 const HEX_WIDTH_2_INV = 2 / HEX_WIDTH;
-
-/**
- * Renders the specified view of a gameboard onto a canvas. The parameter
- * `view` must contain
- *
- *   leftX: the leftmost x of the view, in internal coordinates
- *   topY: the topmost y of the view, in internal coordinates
- *   scale: the factor by which to scale the internal coordinates to map onto
- *          the canvas coordinates; you can think of it as having the units
- *          "pixels / unit"
- */
-export function renderGameboard(gameboard, canvas, view) {
-  limitOncePerFrame(renderGameboard_, gameboard, canvas, view);
-}
-
-/** Internal implementation for the purpose of rate-limiting. */
-function renderGameboard_(gameboard, canvas, view) {
-  console.time('render');
-  clear(canvas);
-  const topLeftIndex = coordsToTileIndex(view.leftX, view.topY);
-  const bottomRightIndex = coordsToTileIndex(
-      view.leftX + canvas.width / view.scale,
-      view.topY + canvas.height / view.scale);
-  for (let ty = topLeftIndex[1] - 1; ty <= bottomRightIndex[1] + 1; ty++) {
-    if (ty < 0 || ty >= gameboard.height) {
-      continue;
-    }
-    for (let tx = topLeftIndex[0] - 1; tx <= bottomRightIndex[0] + 1; tx++) {
-      const tile = gameboard.get(mod(tx, gameboard.width), ty);
-      const [x, y] = getInternalCoords(tx, ty);
-      renderTile(tile, x, y, view, canvas);
-    }
-  }
-  console.timeEnd('render');
-}
-
-/** Constrain view parameters */
-export function updateView(gameboard, canvas, newView) {
-  const gameboardCoordHeight =
-      getInternalCoords(0, gameboard.height - 1)[1] + 1;
-  const gameboardCoordWidth = getInternalCoords(gameboard.width, 0)[0];
-  const scale = clamp(newView.scale, canvas.height / gameboardCoordHeight, 300);
-  return {
-    leftX: mod(newView.leftX, gameboardCoordWidth),
-    topY: clamp(newView.topY, 0, gameboardCoordHeight - canvas.height / scale),
-    scale: scale,
-  };
-}
 
 /**
  * Given the internal coordinates of a point, determines the tile index of the
@@ -107,7 +59,7 @@ export function coordsToTileIndex(x, y) {
 }
 
 /** Erases the canvas. */
-function clear(canvas) {
+export function clear(canvas) {
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -117,7 +69,7 @@ function clear(canvas) {
  * Converts from a tile's index to the internal coordinates of the upper-left
  * corner of its bounding box.
  */
-function getInternalCoords(tx, ty) {
+export function getInternalCoords(tx, ty) {
   return (ty & 1) === 0 ?
       [HEX_WIDTH * tx, 0.75 * ty] :
       [HEX_WIDTH * tx + HEX_WIDTH_2, 0.75 * (ty - 1) + 0.75];
@@ -127,7 +79,8 @@ function getInternalCoords(tx, ty) {
  * Renders the specified view of a single tile onto a canvas given the
  * upper-left corner of its bounding box in internal coordinates.
  */
-function renderTile(tile, x, y, view, canvas) {
+export function renderTile(tile, x, y, view, canvas) {
+  // Terrain
   drawHex(
       canvas, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
       HEX_WIDTH * view.scale, view.scale, tile.color);
