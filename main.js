@@ -6,7 +6,7 @@ console.time('initial render');
 const canvas = document.createElement('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-const gameboard = new Gameboard(10, 25);
+const gameboard = new Gameboard(160, 160);
 let view = {
   leftX: 0,
   topY: 0,
