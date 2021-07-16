@@ -22,6 +22,7 @@ export function renderGameboard(gameboard, canvas, view) {
 
 /** Internal implementation for the purpose of rate-limiting. */
 function renderGameboard_(gameboard, canvas, view) {
+  console.time('render');
   clear(canvas);
   const topLeftIndex = coordsToTileIndex(view.leftX, view.topY);
   const bottomRightIndex = coordsToTileIndex(
@@ -37,6 +38,7 @@ function renderGameboard_(gameboard, canvas, view) {
       renderTile(tile, x, y, view, canvas);
     }
   }
+  console.timeEnd('render');
 }
 
 /** Constrain view parameters */
@@ -106,7 +108,6 @@ export function coordsToTileIndex(x, y) {
 
 /** Erases the canvas. */
 function clear(canvas) {
-  console.log('clear');
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);

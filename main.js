@@ -4,6 +4,7 @@ import {clamp, mod} from './js/util.js';
 
 console.time('initial render');
 const canvas = document.createElement('canvas');
+canvas.style.cursor = 'grab';
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const gameboard = new Gameboard(160, 160);
@@ -38,10 +39,13 @@ document.addEventListener('wheel', e => {
 // drag map
 let dragging = false;
 let startDragX, startDragY;
-document.addEventListener('mousedown', ({layerX, layerY}) => {
-  dragging = true;
-  startDragX = layerX;
-  startDragY = layerY;
+document.addEventListener('mousedown', ({buttons, layerX, layerY}) => {
+  if (buttons === 1) {
+    dragging = true;
+    canvas.style.cursor = 'grabbing';
+    startDragX = layerX;
+    startDragY = layerY;
+  }
 });
 document.addEventListener('mousemove', ({layerX, layerY}) => {
   if (dragging) {
@@ -57,6 +61,7 @@ document.addEventListener('mousemove', ({layerX, layerY}) => {
   }
 });
 function finalizeDragging({layerX, layerY}) {
+  canvas.style.cursor = 'grab';
   if (dragging) {
     dragging = false;
     const dx = (layerX - startDragX) / view.scale;
