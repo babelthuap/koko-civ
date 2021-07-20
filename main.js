@@ -136,3 +136,12 @@ function forEachTile(iteratee) {
     }
   }
 }
+
+window.makeSnaky = makeSnaky;
+window.generateIslands = generateIslands;
+window.randomize = randomize;
+window.step = step;
+window.expandCoastlines = expandCoastlines;
+window.drawCoastAndSea = drawCoastAndSea;
+window.drawLand = drawLand;
+window.forEachTile = forEachTile;
