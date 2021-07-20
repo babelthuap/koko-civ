@@ -11,10 +11,20 @@ body {
   overflow: hidden;
 }
 
+#gameboard {
+  position: fixed;
+}
+
 #gameboard > canvas {
   cursor: grab;
 }
 
 #ui {
+  position: fixed;
   z-index: 100;
+}
+
+#ui button {
+  display: block;
+  margin: 8px 16px;
 }

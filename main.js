@@ -1,23 +1,69 @@
 import {Gameboard} from './js/Gameboard.js';
+import {rand} from './js/util.js';
 
-const board = new Gameboard(100, 100);
+const board = new Gameboard(100, 130);
 window.board = board;
 
 // TODO: Globe view!
 // https://blog.mastermaps.com/2013/09/creating-webgl-earth-with-threejs.html
 
 document.addEventListener('keydown', ({code}) => {
-  if (code === 'Enter') {
-    makeSnaky();
+  if (code === 'KeyA') {
+    archipelago(0.2);
+  }
+  if (code === 'KeyC') {
+    continents(0.25);
   }
 });
+document.getElementById('archipelago')
+    .addEventListener('click', () => archipelago(0.2));
+document.getElementById('continents')
+    .addEventListener('click', () => continents(0.25));
 
-makeSnaky();
+continents(0.25);
 
-function makeSnaky() {
+function continents(landFraction) {
+  let s = performance.now();
+
+  forEachTile(tile => tile.terrain = 'WATER');
+
+  // left
+  for (let i = 0; i < 15; i++) {
+    const x = Math.round(board.width / 8 + rand(board.width) / 6);
+    const y = Math.round(board.height / 8 + rand(board.height) * 5 / 8);
+    board.getTile(x, y).terrain = 'LAND';
+    const nbrs = board.getAdjacentIndexes(x, y);
+    nbrs.forEach(([nx, ny]) => {
+      if (Math.random() < 0.6) board.getTile(nx, ny).terrain = 'LAND';
+    });
+  }
+  // right
+  for (let i = 0; i < 30; i++) {
+    const x = Math.round(board.width / 2 + rand(board.width) * 5 / 16);
+    const y = Math.round(board.height * 2 / 8 + rand(board.height) * 5 / 8);
+    board.getTile(x, y).terrain = 'LAND';
+    const nbrs = board.getAdjacentIndexes(x, y);
+    nbrs.forEach(([nx, ny]) => {
+      if (Math.random() < 0.6) board.getTile(nx, ny).terrain = 'LAND';
+    });
+  }
+
+  const minLandTiles = landFraction * board.width * board.height;
+  while (expandCoastlines() < minLandTiles) {}
+  randStep();
+  while (expandCoastlines() < minLandTiles) {}
+
+  drawCoastAndSea();
+  drawLand();
+
+  console.log(performance.now() - s);
+  board.render();
+}
+
+function archipelago(landFraction) {
   let s = performance.now();
   generateIslands();
-  const minLandTiles = 0.25 * board.width * board.height;
+  const minLandTiles = landFraction * board.width * board.height;
   let i = 0;
   while (expandCoastlines() < minLandTiles) {
     i++;
@@ -61,6 +107,29 @@ function step(...nbrLandRequirements) {
   });
   forEachTile((tile, x, y) => {
     if (set.has(nbrLandCounts[y][x])) {
+      tile.terrain = 'LAND';
+    } else {
+      tile.terrain = 'WATER';
+    }
+  });
+}
+
+function randStep() {
+  const nbrLandCounts = new Array(board.height);
+  for (let y = 0; y < board.height; y++) {
+    nbrLandCounts[y] = new Array(board.width).fill(0);
+  }
+  forEachTile((tile, x, y) => {
+    if (tile.terrain === 'LAND') {
+      const nbrs = board.getAdjacentIndexes(x, y);
+      for (const [nx, ny] of nbrs) {
+        nbrLandCounts[ny][nx]++;
+      }
+    }
+  });
+  forEachTile((tile, x, y) => {
+    const count = nbrLandCounts[y][x];
+    if (rand(6) + 1 < count) {
       tile.terrain = 'LAND';
     } else {
       tile.terrain = 'WATER';
@@ -137,10 +206,12 @@ function forEachTile(iteratee) {
   }
 }
 
-window.makeSnaky = makeSnaky;
+window.continents = continents;
+window.archipelago = archipelago;
 window.generateIslands = generateIslands;
 window.randomize = randomize;
 window.step = step;
+window.randStep = randStep;
 window.expandCoastlines = expandCoastlines;
 window.drawCoastAndSea = drawCoastAndSea;
 window.drawLand = drawLand;
