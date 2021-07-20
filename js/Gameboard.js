@@ -5,6 +5,9 @@ import {clamp, limitOncePerFrame, mod, rand} from './util.js';
 // Gameboard HTML element.
 const GAMEBOARD_EL = document.getElementById('gameboard');
 
+// Maximum scale factor (pixels per unit)
+const MAX_SCALE = 300;
+
 /** The fundamental data structure for the tiles that constitute the map. */
 export function Gameboard(numColumnsOrJson, numRows) {
   /////////////////////
@@ -71,14 +74,18 @@ export function Gameboard(numColumnsOrJson, numRows) {
     render();
   });
 
-  // Zoom map when mouse wheel is rotated.
-  canvas.addEventListener('wheel', ({deltaY}) => {
+  // Zoom map when mouse wheel is rotated. Fix the point underneath the mouse
+  // cursor.
+  canvas.addEventListener('wheel', ({deltaY, layerX, layerY}) => {
+    const internalX = view.leftX + layerX / view.scale;
+    const internalY = view.topY + layerY / view.scale;
+    const newScale = clamp(
+        view.scale - deltaY * 0.25, canvas.height / coordHeight, MAX_SCALE);
     view = constrainView({
-      leftX: view.leftX,
-      topY: view.topY,
-      scale: view.scale - deltaY * 0.25,
+      leftX: internalX - layerX / newScale,
+      topY: internalY - layerY / newScale,
+      scale: newScale,
     });
-    console.log('view.scale:', view.scale);
     render();
   });
 
@@ -219,7 +226,7 @@ export function Gameboard(numColumnsOrJson, numRows) {
 
   /** Constrain view parameters */
   function constrainView(newView) {
-    const scale = clamp(newView.scale, canvas.height / coordHeight, 300);
+    const scale = clamp(newView.scale, canvas.height / coordHeight, MAX_SCALE);
     return {
       leftX: mod(newView.leftX, coordWidth),
       topY: clamp(newView.topY, 0, coordHeight - canvas.height / scale),
