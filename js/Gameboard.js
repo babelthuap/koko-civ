@@ -1,18 +1,9 @@
 import {clear, coordsToTileIndex, getInternalCoords, renderTile} from './renderUtils.js';
+import {serialize} from './serialize.js';
 import {clamp, limitOncePerFrame, mod, rand} from './util.js';
 
 // Gameboard HTML element.
 const GAMEBOARD_EL = document.getElementById('gameboard');
-
-// [TEMP] tile colors
-const OCEAN = [0x4b, 0xb8, 0xe8];
-const LAND = [0x47, 0x7e, 0x19];
-function getRandomTileColor() {
-  return '#' +
-      (Math.random() < 0.8 ? OCEAN : LAND)
-          .map(n => (n - 10 + rand(21)).toString(16).padStart(2, '0'))
-          .join('');
-}
 
 /** The fundamental data structure for the tiles that constitute the map. */
 export function Gameboard(numColumnsOrJson, numRows) {
@@ -43,7 +34,7 @@ export function Gameboard(numColumnsOrJson, numRows) {
       for (let ty = 0; ty < height; ty++) {
         rows[ty] = new Array(width);
         for (let tx = 0; tx < width; tx++) {
-          rows[ty][tx] = {color: getRandomTileColor()};
+          rows[ty][tx] = {terrain: 'OCEAN'};
         }
       }
     }
@@ -65,8 +56,7 @@ export function Gameboard(numColumnsOrJson, numRows) {
   canvas.height = window.innerHeight;
   GAMEBOARD_EL.innerHTML = '';
   GAMEBOARD_EL.append(canvas);
-  let view = constrainView({leftX: 0, topY: 0, scale: 130});
-  render();
+  let view = constrainView({leftX: 0, topY: 0, scale: 0});
 
 
   /////////////////////////
@@ -106,13 +96,6 @@ export function Gameboard(numColumnsOrJson, numRows) {
           startDrag.topY = view.topY;
           startDrag.layerX = layerX;
           startDrag.layerY = layerY;
-          break;
-        case 2:
-          // Highlight the right-clicked tile.
-          invertColor(
-              layerX / view.scale + view.leftX,
-              layerY / view.scale + view.topY);
-          render();
           break;
       }
     });
@@ -181,7 +164,7 @@ export function Gameboard(numColumnsOrJson, numRows) {
   ////////////////////
 
   /** Gets the tile at the specified index. */
-  function get(tx, ty) {
+  function getTile(tx, ty) {
     return 0 <= ty && ty < height ? rows[ty][tx] : undefined;
   }
 
@@ -205,17 +188,17 @@ export function Gameboard(numColumnsOrJson, numRows) {
     return adj;
   }
 
+  /** Renders this gameboard onto its canvas. */
+  function render() {
+    limitOncePerFrame(rawRender);
+  }
+
 
   /////////////////////
   // Private methods //
   /////////////////////
 
-  /** Rate-limited render. Always use this. */
-  function render() {
-    limitOncePerFrame(rawRender);
-  }
-
-  /** Raw render. Never use this directly. */
+  /** Raw, non-rate-limited render. Never use this directly. */
   function rawRender() {
     clear(canvas);
     const topLeftIndex = coordsToTileIndex(view.leftX, view.topY);
@@ -227,25 +210,9 @@ export function Gameboard(numColumnsOrJson, numRows) {
         continue;
       }
       for (let tx = topLeftIndex[0] - 1; tx <= bottomRightIndex[0] + 1; tx++) {
-        const tile = get(mod(tx, width), ty);
+        const tile = getTile(mod(tx, width), ty);
         const [x, y] = getInternalCoords(tx, ty);
         renderTile(tile, x, y, view, canvas);
-      }
-    }
-  }
-
-  /** [TEMP] Test that click detection is working. */
-  function invertColor(x, y) {
-    const tileIndex = coordsToTileIndex(x, y);
-    tileIndex[0] = mod(tileIndex[0], width);
-    const nbrIndexes = getAdjacentIndexes(tileIndex[0], tileIndex[1]);
-    for (const index of [tileIndex, ...nbrIndexes]) {
-      const tile = get(index[0], index[1]);
-      if (tile) {
-        tile.color = '#' +
-            (0xffffff - parseInt(tile.color.slice(1), 16))
-                .toString(16)
-                .padStart(6, '0');
       }
     }
   }
@@ -265,8 +232,10 @@ export function Gameboard(numColumnsOrJson, numRows) {
   // Expose public methods //
   ///////////////////////////
   return {
-    get: get,
+    getTile: getTile,
     getAdjacentIndexes: getAdjacentIndexes,
+    render: render,
+    serialize: () => serialize(rows),
     toJSON: () => rows,
     get width() {
       return width;

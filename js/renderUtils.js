@@ -1,3 +1,4 @@
+import {Terrain} from './terrain.js';
 import {mod} from './util.js';
 
 // The width of each hex in internal coordinates. (The height is 1.)
@@ -81,9 +82,11 @@ export function getInternalCoords(tx, ty) {
  */
 export function renderTile(tile, x, y, view, canvas) {
   // Terrain
+  const color =
+      (tile.terrain in Terrain) ? Terrain[tile.terrain].color : '#f0f';
   drawHex(
       canvas, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
-      HEX_WIDTH * view.scale, view.scale, tile.color);
+      HEX_WIDTH * view.scale, view.scale, color);
 }
 
 /**

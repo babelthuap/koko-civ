@@ -11,6 +11,26 @@ export const rand = (n) => Math.floor(Math.random() * n);
 export const randColor = () =>
     '#' + new Array(6).fill().map(() => rand(16).toString(16)).join('');
 
+/** Like Array.map, but for general Object properties. */
+const mapObject = (obj, callbackFn) => {
+  const out = {};
+  for (let key in obj) {
+    out[key] = callbackFn(obj[key], key, obj);
+  }
+  return out;
+};
+
+/** Like Array.filter, but for general Object properties. */
+const filterObject = (obj, callbackFn) => {
+  const out = {};
+  for (let key in obj) {
+    if (callbackFn(obj[key], key, obj)) {
+      out[key] = obj[key];
+    }
+  }
+  return out;
+};
+
 /** Map from functions to their most recently-requested args. */
 const fnArgs = new Map();
 
