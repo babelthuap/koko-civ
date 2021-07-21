@@ -15,16 +15,13 @@ body {
   position: fixed;
 }
 
-#gameboard > canvas {
-  cursor: grab;
-}
-
 #ui {
   position: fixed;
   z-index: 100;
 }
 
 #ui button {
+  cursor: pointer;
   display: block;
   margin: 8px 16px;
 }

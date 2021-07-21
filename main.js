@@ -1,7 +1,7 @@
-import {Gameboard} from './js/Gameboard.js';
+import board from './js/gameboard.js';
 import {rand} from './js/util.js';
 
-const board = new Gameboard(100, 130);
+board.init({width: 100, height: 130});
 window.board = board;
 
 // TODO: Globe view!
@@ -22,6 +22,20 @@ document.getElementById('continents')
 
 continents(0.25);
 
+board.addClickListener((event, tile) => {
+  switch (event.button) {
+    case 0:
+      // Left click.
+      tile.terrain = 'MOUNTAIN';
+      board.render();
+      break;
+    case 2:
+      // Right click.
+      alert(tile.terrain);
+      break;
+  }
+});
+
 function continents(landFraction) {
   let s = performance.now();
 
@@ -32,7 +46,7 @@ function continents(landFraction) {
     const x = Math.round(board.width / 8 + rand(board.width) / 6);
     const y = Math.round(board.height / 8 + rand(board.height) * 5 / 8);
     board.getTile(x, y).terrain = 'LAND';
-    const nbrs = board.getAdjacentIndexes(x, y);
+    const nbrs = board.getAdjacentCoordinates(x, y);
     nbrs.forEach(([nx, ny]) => {
       if (Math.random() < 0.6) board.getTile(nx, ny).terrain = 'LAND';
     });
@@ -42,16 +56,18 @@ function continents(landFraction) {
     const x = Math.round(board.width / 2 + rand(board.width) * 5 / 16);
     const y = Math.round(board.height * 2 / 8 + rand(board.height) * 5 / 8);
     board.getTile(x, y).terrain = 'LAND';
-    const nbrs = board.getAdjacentIndexes(x, y);
+    const nbrs = board.getAdjacentCoordinates(x, y);
     nbrs.forEach(([nx, ny]) => {
       if (Math.random() < 0.6) board.getTile(nx, ny).terrain = 'LAND';
     });
   }
 
   const minLandTiles = landFraction * board.width * board.height;
-  while (expandCoastlines() < minLandTiles) {}
+  while (expandCoastlines() < minLandTiles) {
+  }
   randStep();
-  while (expandCoastlines() < minLandTiles) {}
+  while (expandCoastlines() < minLandTiles) {
+  }
 
   drawCoastAndSea();
   drawLand();
@@ -99,7 +115,7 @@ function step(...nbrLandRequirements) {
   }
   forEachTile((tile, x, y) => {
     if (tile.terrain === 'LAND') {
-      const nbrs = board.getAdjacentIndexes(x, y);
+      const nbrs = board.getAdjacentCoordinates(x, y);
       for (const [nx, ny] of nbrs) {
         nbrLandCounts[ny][nx]++;
       }
@@ -121,7 +137,7 @@ function randStep() {
   }
   forEachTile((tile, x, y) => {
     if (tile.terrain === 'LAND') {
-      const nbrs = board.getAdjacentIndexes(x, y);
+      const nbrs = board.getAdjacentCoordinates(x, y);
       for (const [nx, ny] of nbrs) {
         nbrLandCounts[ny][nx]++;
       }
@@ -144,7 +160,7 @@ function expandCoastlines() {
   }
   forEachTile((tile, x, y) => {
     if (tile.terrain === 'LAND') {
-      const nbrs = board.getAdjacentIndexes(x, y);
+      const nbrs = board.getAdjacentCoordinates(x, y);
       for (const [nx, ny] of nbrs) {
         nbrLandCounts[ny][nx]++;
       }
@@ -171,7 +187,7 @@ function drawCoastAndSea() {
   // Coast
   forEachTile((tile, x, y) => {
     if (tile.terrain === 'WATER') {
-      const nbrs = board.getAdjacentIndexes(x, y);
+      const nbrs = board.getAdjacentCoordinates(x, y);
       if (nbrs.some(([nx, ny]) => board.getTile(nx, ny).terrain === 'LAND')) {
         tile.terrain = 'COAST';
       }
@@ -179,7 +195,7 @@ function drawCoastAndSea() {
   });
   // Sea and ocean
   forEachTile((tile, x, y) => {
-    const nbrs = board.getAdjacentIndexes(x, y);
+    const nbrs = board.getAdjacentCoordinates(x, y);
     if (tile.terrain === 'WATER') {
       if (nbrs.some(([nx, ny]) => board.getTile(nx, ny).terrain === 'COAST')) {
         tile.terrain = 'SEA';

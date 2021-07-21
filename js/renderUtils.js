@@ -8,10 +8,10 @@ const HEX_WIDTH_2 = HEX_WIDTH / 2;
 const HEX_WIDTH_2_INV = 2 / HEX_WIDTH;
 
 /**
- * Given the internal coordinates of a point, determines the tile index of the
+ * Given the internal coordinates of a point, determines the position of the
  * tile that contains that point.
  */
-export function coordsToTileIndex(x, y) {
+export function coordsToPosition(x, y, width) {
   // Conceptually, we break up each hex into quarter-heights and half-widths.
   // The behavior of this method depends on which quarter-row and half-column
   // the input point happens to be in.
@@ -67,7 +67,7 @@ export function clear(canvas) {
 }
 
 /**
- * Converts from a tile's index to the internal coordinates of the upper-left
+ * Converts from a tile's position to the internal coordinates of the upper-left
  * corner of its bounding box.
  */
 export function getInternalCoords(tx, ty) {
