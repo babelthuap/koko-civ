@@ -36,3 +36,6 @@ board.addClickListener((event, tile) => {
       break;
   }
 });
+
+// Expose board
+window.board = board;

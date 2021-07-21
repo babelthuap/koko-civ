@@ -1,5 +1,5 @@
+import {compress, decompress} from './compression.js';
 import {clear, coordsToPosition, getInternalCoords, renderTile} from './renderUtils.js';
-import {serialize} from './serialize.js';
 import {clamp, limitOncePerFrame, mod} from './util.js';
 
 // TODO: Globe view!
@@ -72,24 +72,23 @@ function Gameboard() {
 
   /** Serializes the board. */
   function save() {
-    return JSON.stringify({tiles, options: {width, height, wrap}});
+    return JSON.stringify([{width, height, wrap}, compress(tiles)]);
   }
 
   /** Initializes the board from serialized data. */
   function load(serialized) {
-    const deserialized = JSON.parse(serialized);
+    const [options, compressedTiles] = JSON.parse(serialized);
+    const decompressedTiles = decompress(compressedTiles);
 
-    console.assert(Array.isArray(deserialized.tiles));
-    console.assert(Number.isInteger(deserialized.options.width));
-    console.assert(Number.isInteger(deserialized.options.height));
-    console.assert(
-        deserialized.tiles.length ===
-        deserialized.options.width * deserialized.options.height);
+    console.assert(Array.isArray(decompressedTiles));
+    console.assert(Number.isInteger(options.width));
+    console.assert(Number.isInteger(options.height));
+    console.assert(decompressedTiles.length === options.width * options.height);
 
-    width = deserialized.options.width;
-    height = deserialized.options.height;
-    wrap = deserialized.options.wrap;
-    tiles = deserialized.tiles;
+    width = options.width;
+    height = options.height;
+    wrap = options.wrap;
+    tiles = decompressedTiles;
     coordWidth = getInternalCoords(width, 0)[0];
     coordHeight = getInternalCoords(0, height - 1)[1] + 1;
     updateView({leftX: 0, topY: 0, scale: 0});

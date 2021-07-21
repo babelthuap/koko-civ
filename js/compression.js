@@ -1,20 +1,15 @@
 // The base to use when converting a number to or from a string.
 const BASE = 36;
 
-/** Serializes a POJO, compressing strings. */
-export function serialize(data) {
+/** Compresses a POJO. Useful if there are many repeated strings. */
+export function compress(data) {
   const stringMap = new Map();
-  const compressedData = compress(data, stringMap);
-  return JSON.stringify([[...stringMap.keys()], compressedData]);
+  const compressedData = compress_(data, stringMap);
+  return [compressedData, [...stringMap.keys()]];
 }
 
-/** Deserializes JSON, assuming it was serialized with `serialize`. */
-export function deserialize(json) {
-  const [strings, data] = JSON.parse(json);
-  return decompress(data, strings);
-}
-
-function compress(data, stringMap) {
+/** Recursive helper. */
+function compress_(data, stringMap) {
   switch (typeof data) {
     case 'string':
       let compressed = stringMap.get(data);
@@ -25,11 +20,11 @@ function compress(data, stringMap) {
       return compressed;
     case 'object':
       if (Array.isArray(data)) {
-        return data.map(el => compress(el, stringMap));
+        return data.map(el => compress_(el, stringMap));
       } else {
         // Compress both keys and values
         return Object.entries(data).reduce((obj, [key, value]) => {
-          obj[compress(key, stringMap)] = compress(value, stringMap);
+          obj[compress_(key, stringMap)] = compress_(value, stringMap);
           return obj;
         }, {});
       }
@@ -38,7 +33,13 @@ function compress(data, stringMap) {
   }
 }
 
-function decompress(data, strings) {
+/** Inverse of `compress`. */
+export function decompress(compressed) {
+  return decompress_(compressed[0], compressed[1]);
+}
+
+/** Recursive helper. */
+function decompress_(data, strings) {
   switch (typeof data) {
     case 'string':
       return strings[parseInt(data, BASE)];
@@ -46,12 +47,12 @@ function decompress(data, strings) {
       if (Array.isArray(data)) {
         // Mutate array in place, element by element
         for (let i = 0; i < data.length; i++) {
-          data[i] = decompress(data[i], strings);
+          data[i] = decompress_(data[i], strings);
         }
         return data;
       } else {
         return Object.entries(data).reduce((obj, [key, value]) => {
-          obj[decompress(key, strings)] = decompress(value, strings);
+          obj[decompress_(key, strings)] = decompress_(value, strings);
           return obj;
         }, {});
       }
