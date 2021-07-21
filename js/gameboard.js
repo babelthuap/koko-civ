@@ -148,73 +148,9 @@ function Gameboard() {
     clickListeners = [];
   }
 
-
-  /*******************/
-  /* PRIVATE METHODS */
-  /*******************/
-
-  function rawRender() {
-    // Raw, non-rate-limited render. Never use this directly.
-    clear(canvas);
-    const topLeftIndex = coordsToPosition(view.leftX, view.topY, width);
-    const bottomRightIndex = coordsToPosition(
-        view.leftX + canvas.width / view.scale,
-        view.topY + canvas.height / view.scale, width);
-    for (let ty = topLeftIndex[1] - 1; ty <= bottomRightIndex[1] + 1; ty++) {
-      if (ty < 0 || ty >= height) {
-        continue;
-      }
-      for (let tx = topLeftIndex[0] - 1; tx <= bottomRightIndex[0] + 1; tx++) {
-        const tile = tiles[width * ty + mod(tx, width)];
-        const [x, y] = getInternalCoords(tx, ty);
-        renderTile(tile, x, y, view, canvas);
-      }
-    }
-  }
-
-  let listenersAttached = false;
-  function attachListeners() {
-    if (listenersAttached) return;
-    listenersAttached = true;
-    window.addEventListener('resize', handleResize);
-    canvas.addEventListener('wheel', handleWheel);
-    document.addEventListener('keydown', handleKeydown);
-    attachMouseListeners();
-  }
-
-  function handleResize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    updateView(view);
-    render();
-  }
-
-
-  function handleWheel({deltaY, layerX, layerY}) {
-    // Fix the *internal* position that the cursor is hovering over. I.e., try
-    // to re-center the view so that the the cursor is hovering over the same
-    // tile before and after zooming.
-    const internalX = view.leftX + layerX / view.scale;
-    const internalY = view.topY + layerY / view.scale;
-
-    // Relate the wheel's y-scale to our scale logarithmically. I tried linear
-    // and quadratic relationships, but this feels better.
-    const logScale = Math.log(view.scale);
-    const newLogScale = logScale - deltaY * 0.007;
-    const newScale =
-        clamp(Math.exp(newLogScale), canvas.height / coordHeight, MAX_SCALE);
-
-    updateView({
-      leftX: internalX - layerX / newScale,
-      topY: internalY - layerY / newScale,
-      scale: newScale,
-    });
-    render();
-  }
-
+  /** Handles a keydown event. */
   function handleKeydown(event) {
-    // TODO: Handle all keyboard events externally.
-    switch (event.code) {
+    switch (event.key) {
       case 'ArrowDown':
         updateView({leftX: view.leftX, topY: view.topY + 1, scale: view.scale});
         return render();
@@ -246,6 +182,73 @@ function Gameboard() {
         updateView({leftX: 0, topY: 0, scale: 0});
         return render();
     }
+  }
+
+
+  /*******************/
+  /* PRIVATE METHODS */
+  /*******************/
+
+  function rawRender() {
+    // Raw, non-rate-limited render. Never use this directly.
+    clear(canvas);
+    const topLeftIndex = coordsToPosition(view.leftX, view.topY, width);
+    const bottomRightIndex = coordsToPosition(
+        view.leftX + canvas.width / view.scale,
+        view.topY + canvas.height / view.scale, width);
+    for (let ty = topLeftIndex[1] - 1; ty <= bottomRightIndex[1] + 1; ty++) {
+      if (ty < 0 || ty >= height) {
+        continue;
+      }
+      for (let tx = topLeftIndex[0] - 1; tx <= bottomRightIndex[0] + 1; tx++) {
+        const tile = tiles[width * ty + mod(tx, width)];
+        const [x, y] = getInternalCoords(tx, ty);
+        renderTile(tile, x, y, view, canvas);
+      }
+    }
+  }
+
+  let listenersAttached = false;
+  let mouseInCanvas = false;
+  function attachListeners() {
+    if (listenersAttached) return;
+    listenersAttached = true;
+    window.addEventListener('resize', handleResize);
+    canvas.addEventListener('mouseenter', () => mouseInCanvas = true);
+    canvas.addEventListener('mouseleave', () => mouseInCanvas = false);
+    canvas.addEventListener('wheel', handleWheel);
+    attachMouseListeners();
+  }
+
+  function handleResize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    updateView(view);
+    render();
+  }
+
+  function handleWheel({deltaY, layerX, layerY}) {
+    if (!mouseInCanvas) return;
+
+    // Fix the *internal* position that the cursor is hovering over. I.e., try
+    // to re-center the view so that the the cursor is hovering over the same
+    // tile before and after zooming.
+    const internalX = view.leftX + layerX / view.scale;
+    const internalY = view.topY + layerY / view.scale;
+
+    // Relate the wheel's y-scale to our scale logarithmically. I tried linear
+    // and quadratic relationships, but this feels better.
+    const logScale = Math.log(view.scale);
+    const newLogScale = logScale - deltaY * 0.007;
+    const newScale =
+        clamp(Math.exp(newLogScale), canvas.height / coordHeight, MAX_SCALE);
+
+    updateView({
+      leftX: internalX - layerX / newScale,
+      topY: internalY - layerY / newScale,
+      scale: newScale,
+    });
+    render();
   }
 
   function attachMouseListeners() {
@@ -348,6 +351,7 @@ function Gameboard() {
     addClickListener: addClickListener,
     removeClickListener: removeClickListener,
     clearClickListeners: clearClickListeners,
+    handleKeydown: handleKeydown,
     get width() {
       return width;
     },

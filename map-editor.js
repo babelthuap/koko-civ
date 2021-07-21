@@ -3,16 +3,21 @@ import archipelago from './map-scripts/archipelago.js';
 import continents from './map-scripts/continents.js';
 
 board.init({width: 100, height: 130});
-board.render();
+continents(board, 0.25);
 
-document.addEventListener('keydown', ({code}) => {
-  if (code === 'KeyA') {
-    archipelago(board, 0.2);
-  }
-  if (code === 'KeyC') {
-    continents(board, 0.25);
+document.addEventListener('keydown', (event) => {
+  switch (event.key) {
+    case 'a':
+      archipelago(board, 0.2);
+      break;
+    case 'c':
+      continents(board, 0.25);
+      break;
+    default:
+      board.handleKeydown(event);
   }
 });
+
 document.getElementById('archipelago')
     .addEventListener('click', () => archipelago(board, 0.2));
 document.getElementById('continents')
