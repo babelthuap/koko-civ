@@ -9,7 +9,25 @@
   height: 480px;
   width: 640px;
   left: 50vw;
-  text-align: center;
   top: 50vh;
   transform: translate(-50%, -50%);
+}
+
+#main-menu .title {
+  text-align: center;
+}
+
+#main-menu .menu {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#main-menu button {
+  background: linear-gradient(135deg, #fff, #baa);
+  font-size: 16px;
+}
+
+#main-menu .cow::before {
+  content: "🐄";
+  font-size: 80px;
 }

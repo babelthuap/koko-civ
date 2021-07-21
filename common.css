@@ -22,4 +22,6 @@ body {
 
 button {
   cursor: pointer;
+  border-radius: 16px;
+  padding: 2px 8px;
 }
