@@ -1,0 +1,15 @@
+/* Styles that only apply to index (the main game). */
+
+#main-menu {
+  color: #111;
+  background-color: #eee;
+  border-radius: 16px;
+  box-shadow: 8px 8px 8px #222;
+  padding: 16px;
+  height: 480px;
+  width: 640px;
+  left: 50vw;
+  text-align: center;
+  top: 50vh;
+  transform: translate(-50%, -50%);
+}

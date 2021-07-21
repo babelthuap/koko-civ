@@ -2,6 +2,9 @@ import {clear, coordsToPosition, getInternalCoords, renderTile} from './renderUt
 import {serialize} from './serialize.js';
 import {clamp, limitOncePerFrame, mod} from './util.js';
 
+// TODO: Globe view!
+// https://blog.mastermaps.com/2013/09/creating-webgl-earth-with-threejs.html
+
 export default new Gameboard();
 
 function Gameboard() {
@@ -288,7 +291,7 @@ function Gameboard() {
         case 0:
           // Left click: end dragging and invoke click listeners if the cursor
           // has not moved much since mousedown.
-          const shouldInvokeClickListeners = !dragging ||
+          const shouldInvokeClickListeners = (mousePressed && !dragging) ||
               (Math.abs(event.layerX - startDrag.layerX) < 2 &&
                Math.abs(event.layerY - startDrag.layerY) < 2);
           finalizeDragging(event);
