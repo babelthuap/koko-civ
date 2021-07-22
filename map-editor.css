@@ -53,3 +53,12 @@
 button, select {
   background-color: #fff;
 }
+
+#controls .content div {
+  margin-bottom: 8px;
+}
+
+#controls .content input {
+  margin-right: 8px;
+  width: 47px;
+}

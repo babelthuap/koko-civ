@@ -15,14 +15,20 @@
       <div class="plus" style="display: none;"></div>
     </div>
     <div class="content">
-      Generate:
-      <button id="archipelago">Archipelago</button>
-      <button id="continents">Continents</button>
+      <div>
+        Generate:
+        <button id="archipelago">Archipelago</button>
+        <button id="continents">Continents</button>
+      </div>
+      <div>
+        <label for="width">Width = </label><input id="width" type="number">
+        <label for="height">Height = </label><input id="height" type="number">
+      </div>
       <hr>
-      <p>
+      <div>
         Draw:
         <select id="terrain-select"></select>
-      </p>
+      </div>
     </div>
   </div>
   <script type="module" src="map-editor.js"></script>

@@ -5,16 +5,56 @@ import {clamp, constantCaseToTitleCase, limitOncePerFrame} from './js/util.js';
 import archipelago from './map-scripts/archipelago.js';
 import continents from './map-scripts/continents.js';
 
-board.init({width: 100, height: 130});
-continents(board, 0.25);
+// Elements.
+const WIDTH_INPUT = document.getElementById('width');
+const HEIGHT_INPUT = document.getElementById('height');
+const TERRAIN_SELECT = document.getElementById('terrain-select');
+const CONTROLS = document.getElementById('controls');
+const DRAGBAR = CONTROLS.querySelector('#dragbar');
+const MINIMIZE = CONTROLS.querySelector('#minimize');
+const PLUS = MINIMIZE.querySelector('.plus');
+const CONTENT = CONTROLS.querySelector('.content');
+
+// Load parameters from localStorage.
+const params = (() => {
+  const json = localStorage['KOKO_CIV.map_editor_params'];
+  return json ? JSON.parse(json) : {};
+})();
+updateUI();
+
+// Updates parameters and syncs them with localStorage.
+params.set = (patch) => {
+  for (const [key, value] of Object.entries(patch)) {
+    params[key] = value;
+  }
+  localStorage['KOKO_CIV.map_editor_params'] = JSON.stringify(params);
+  updateUI();
+};
+
+// Sync the current params to the UI.
+function updateUI() {
+  WIDTH_INPUT.value = params.width;
+  HEIGHT_INPUT.value = params.height;
+}
+
+// Re-initialize the board with the currently-chosen width & height.
+function updateBoardDimensions() {
+  params.set({
+    width: clamp(parseInt(WIDTH_INPUT.value), 10, 512) || /* default= */ 100,
+    height: clamp(parseInt(HEIGHT_INPUT.value), 10, 512) || /* default= */ 130,
+  });
+  board.init(params);
+}
 
 // Handle key presses.
 document.addEventListener('keydown', (event) => {
   switch (event.key) {
     case 'a':
+      updateBoardDimensions();
       archipelago(board, 0.2);
       break;
     case 'c':
+      updateBoardDimensions();
       continents(board, 0.25);
       break;
     default:
@@ -22,14 +62,17 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-// Handle button clicks.
-document.getElementById('archipelago')
-    .addEventListener('click', () => archipelago(board, 0.2));
-document.getElementById('continents')
-    .addEventListener('click', () => continents(board, 0.25));
+// Map generation controls.
+document.getElementById('archipelago').addEventListener('click', () => {
+  updateBoardDimensions();
+  archipelago(board, 0.2);
+});
+document.getElementById('continents').addEventListener('click', () => {
+  updateBoardDimensions();
+  continents(board, 0.25);
+});
 
 // Initialize terrain dropdown.
-const TERRAIN_SELECT = document.getElementById('terrain-select');
 Object.entries(Terrain).forEach(([terrain, stats]) => {
   if (stats.color) {  // TODO: Remove once all terrain types are implemented.
     const option = document.createElement('option');
@@ -55,8 +98,6 @@ board.addClickListener((event, tile) => {
 });
 
 // Handle click-and-drag for the controls window.
-const CONTROLS = document.getElementById('controls');
-const DRAGBAR = CONTROLS.querySelector('#dragbar');
 let controlsBoundingBox;
 registerDragCallbacks(DRAGBAR, {
   onDragStart: () => {
@@ -74,9 +115,6 @@ registerDragCallbacks(DRAGBAR, {
 });
 
 // Handle minimizing controls
-const MINIMIZE = CONTROLS.querySelector('#minimize');
-const PLUS = MINIMIZE.querySelector('.plus');
-const CONTENT = CONTROLS.querySelector('.content');
 let isMinimized = false;
 MINIMIZE.addEventListener('mousedown', () => {
   isMinimized = !isMinimized;
@@ -91,3 +129,7 @@ MINIMIZE.addEventListener('mousedown', () => {
 
 // Expose board
 window.board = board;
+
+// Display an initial map.
+updateBoardDimensions();
+continents(board, 0.25);
