@@ -206,7 +206,7 @@ function Gameboard() {
         continue;
       }
       for (let tx = topLeftIndex[0] - 1; tx <= bottomRightIndex[0] + 1; tx++) {
-        if (!wrap && (tx < 0 || tx > width)) {
+        if (!wrap && (tx < 0 || tx >= width)) {
           continue;
         }
         const tile = tiles[width * ty + mod(tx, width)];
