@@ -63,7 +63,7 @@ function Gameboard() {
   function init(options) {
     width = options.width;
     height = options.height;
-    wrap = options.wrap || 1;  // default = CYLINDRICAL
+    wrap = options.wrap;
     tiles = new Array(width * height).fill().map(() => ({terrain: 'OCEAN'}));
     coordWidth = getInternalCoords(width, 0)[0];
     coordHeight = getInternalCoords(0, height - 1)[1] + 1;
@@ -99,6 +99,11 @@ function Gameboard() {
   /** Renders the gameboard. */
   function render() {
     limitOncePerFrame(rawRender);
+  }
+
+  /** Sets wrap on or off. */
+  function setWrap(shouldWrap) {
+    wrap = shouldWrap;
   }
 
   /** Gets the tile at the specified position. */
@@ -201,6 +206,9 @@ function Gameboard() {
         continue;
       }
       for (let tx = topLeftIndex[0] - 1; tx <= bottomRightIndex[0] + 1; tx++) {
+        if (!wrap && (tx < 0 || tx > width)) {
+          continue;
+        }
         const tile = tiles[width * ty + mod(tx, width)];
         const [x, y] = getInternalCoords(tx, ty);
         renderTile(tile, x, y, view, canvas);
@@ -270,7 +278,7 @@ function Gameboard() {
           topY: startDragTopY - dy / view.scale,
           scale: view.scale,
         });
-        rawRender(); // Note that onDrag is already rate-limited.
+        rawRender();  // Note that onDrag is already rate-limited.
       },
       onLeftClick: invokeClickListeners,
       onRightClick: invokeClickListeners,
@@ -280,11 +288,15 @@ function Gameboard() {
     });
 
     function invokeClickListeners(event) {
-      const [tx, ty] = coordsToPosition(
-          mod(view.leftX + event.offsetX / view.scale, coordWidth),
-          view.topY + event.offsetY / view.scale, width);
+      const x = wrap ?
+          mod(view.leftX + event.offsetX / view.scale, coordWidth) :
+          view.leftX + event.offsetX / view.scale;
+      const [tx, ty] =
+          coordsToPosition(x, view.topY + event.offsetY / view.scale, width);
       const tile = getTile(tx, ty);
-      clickListeners.forEach(callback => callback(event, tile));
+      if (tile) {
+        clickListeners.forEach(callback => callback(event, tile));
+      }
     }
   }
 
@@ -293,12 +305,10 @@ function Gameboard() {
    * the map.
    */
   function updateView(newView) {
-    const scale = clamp(newView.scale, canvas.height / coordHeight, MAX_SCALE);
-    const leftX = mod(newView.leftX, coordWidth);
-    const topY = clamp(newView.topY, 0, coordHeight - canvas.height / scale);
-    view.scale = scale;
-    view.leftX = leftX;
-    view.topY = topY;
+    view.scale = clamp(newView.scale, canvas.height / coordHeight, MAX_SCALE);
+    view.leftX = wrap ? mod(newView.leftX, coordWidth) : newView.leftX;
+    view.topY =
+        clamp(newView.topY, 0, coordHeight - canvas.height / view.scale);
   }
 
 
@@ -310,6 +320,7 @@ function Gameboard() {
     save: save,
     load: load,
     render: render,
+    setWrap: setWrap,
     getTile: getTile,
     getAdjacentCoordinates: getAdjacentCoordinates,
     addClickListener: addClickListener,

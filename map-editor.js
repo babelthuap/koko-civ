@@ -9,6 +9,7 @@ import continents from './map-scripts/continents.js';
 const WIDTH_INPUT = document.getElementById('width');
 const HEIGHT_INPUT = document.getElementById('height');
 const PERSPECTIVE = document.getElementById('perspective');
+const WRAP = document.getElementById('wrap');
 const TERRAIN_SELECT = document.getElementById('terrain-select');
 const CONTROLS = document.getElementById('controls');
 const DRAGBAR = CONTROLS.querySelector('#dragbar');
@@ -36,17 +37,12 @@ params.set = (patch) => {
 function updateUI() {
   WIDTH_INPUT.value = params.width;
   HEIGHT_INPUT.value = params.height;
+  WRAP.checked = params.wrap;
   PERSPECTIVE.checked = params.perspective;
   if (params.perspective) {
     document.body.classList.add('perspective');
-    window.HEX_WIDTH = 1;
-    window.HEX_WIDTH_2 = window.HEX_WIDTH / 2;
-    window.HEX_WIDTH_2_INV = 2 / window.HEX_WIDTH;
   } else {
     document.body.classList.remove('perspective');
-    window.HEX_WIDTH = Math.sqrt(3);
-    window.HEX_WIDTH_2 = window.HEX_WIDTH / 2;
-    window.HEX_WIDTH_2_INV = 2 / window.HEX_WIDTH;
   }
 }
 
@@ -63,6 +59,14 @@ function updateBoardDimensions() {
 PERSPECTIVE.addEventListener('change', () => {
   params.set({perspective: PERSPECTIVE.checked});
   updateUI();
+  board.render();
+});
+
+// Toggle wrap.
+WRAP.addEventListener('change', () => {
+  params.set({wrap: WRAP.checked});
+  updateUI();
+  board.setWrap(params.wrap);
   board.render();
 });
 
