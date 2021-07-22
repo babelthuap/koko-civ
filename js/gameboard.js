@@ -166,14 +166,14 @@ function Gameboard() {
       case 'PageUp':
         return handleWheel({
           deltaY: -10,
-          layerX: window.innerWidth / 2,
-          layerY: window.innerHeight / 2,
+          offsetX: window.innerWidth / 2,
+          offsetY: window.innerHeight / 2,
         });
       case 'PageDown':
         return handleWheel({
           deltaY: 10,
-          layerX: window.innerWidth / 2,
-          layerY: window.innerHeight / 2,
+          offsetX: window.innerWidth / 2,
+          offsetY: window.innerHeight / 2,
         });
       case 'Home':
         updateView({leftX: 0, topY: 0, scale: 100});
@@ -227,14 +227,14 @@ function Gameboard() {
     render();
   }
 
-  function handleWheel({deltaY, layerX, layerY}) {
+  function handleWheel({deltaY, offsetX, offsetY}) {
     if (!mouseInCanvas) return;
 
     // Fix the *internal* position that the cursor is hovering over. I.e., try
     // to re-center the view so that the the cursor is hovering over the same
     // tile before and after zooming.
-    const internalX = view.leftX + layerX / view.scale;
-    const internalY = view.topY + layerY / view.scale;
+    const internalX = view.leftX + offsetX / view.scale;
+    const internalY = view.topY + offsetY / view.scale;
 
     // Relate the wheel's y-scale to our scale logarithmically. I tried linear
     // and quadratic relationships, but this feels better.
@@ -244,8 +244,8 @@ function Gameboard() {
         clamp(Math.exp(newLogScale), canvas.height / coordHeight, MAX_SCALE);
 
     updateView({
-      leftX: internalX - layerX / newScale,
-      topY: internalY - layerY / newScale,
+      leftX: internalX - offsetX / newScale,
+      topY: internalY - offsetY / newScale,
       scale: newScale,
     });
     render();
@@ -281,8 +281,8 @@ function Gameboard() {
 
     function invokeClickListeners(event) {
       const [tx, ty] = coordsToPosition(
-          mod(view.leftX + event.layerX / view.scale, coordWidth),
-          view.topY + event.layerY / view.scale, width);
+          mod(view.leftX + event.offsetX / view.scale, coordWidth),
+          view.topY + event.offsetY / view.scale, width);
       const tile = getTile(tx, ty);
       clickListeners.forEach(callback => callback(event, tile));
     }
