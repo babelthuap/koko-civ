@@ -8,6 +8,7 @@ import continents from './map-scripts/continents.js';
 // Elements.
 const WIDTH_INPUT = document.getElementById('width');
 const HEIGHT_INPUT = document.getElementById('height');
+const PERSPECTIVE = document.getElementById('perspective');
 const TERRAIN_SELECT = document.getElementById('terrain-select');
 const CONTROLS = document.getElementById('controls');
 const DRAGBAR = CONTROLS.querySelector('#dragbar');
@@ -35,6 +36,18 @@ params.set = (patch) => {
 function updateUI() {
   WIDTH_INPUT.value = params.width;
   HEIGHT_INPUT.value = params.height;
+  PERSPECTIVE.checked = params.perspective;
+  if (params.perspective) {
+    document.body.classList.add('perspective');
+    window.HEX_WIDTH = 1;
+    window.HEX_WIDTH_2 = window.HEX_WIDTH / 2;
+    window.HEX_WIDTH_2_INV = 2 / window.HEX_WIDTH;
+  } else {
+    document.body.classList.remove('perspective');
+    window.HEX_WIDTH = Math.sqrt(3);
+    window.HEX_WIDTH_2 = window.HEX_WIDTH / 2;
+    window.HEX_WIDTH_2_INV = 2 / window.HEX_WIDTH;
+  }
 }
 
 // Re-initialize the board with the currently-chosen width & height.
@@ -45,6 +58,13 @@ function updateBoardDimensions() {
   });
   board.init(params);
 }
+
+// Toggle perspective.
+PERSPECTIVE.addEventListener('change', () => {
+  params.set({perspective: PERSPECTIVE.checked});
+  updateUI();
+  board.render();
+});
 
 // Handle key presses.
 document.addEventListener('keydown', (event) => {

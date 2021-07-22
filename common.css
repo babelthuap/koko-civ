@@ -13,8 +13,10 @@ body {
 
 #gameboard {
   position: fixed;
-  /* Faux 3D */
-  /* transform: perspective(600px) rotateX(15deg) scale(1.5); */
+}
+
+.perspective #gameboard {
+  transform: perspective(600px) rotateX(15deg) scale(1.5);
 }
 
 .ui {

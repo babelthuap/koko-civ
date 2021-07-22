@@ -54,11 +54,11 @@ button, select {
   background-color: #fff;
 }
 
-#controls .content div {
+#controls .content > div {
   margin-bottom: 8px;
 }
 
-#controls .content input {
+#controls .content input[type="number"] {
   margin-right: 8px;
   width: 47px;
 }
