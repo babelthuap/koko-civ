@@ -1,11 +1,51 @@
 /* Styles that only apply to map-editor. */
 
-button:nth-of-type(1) {
-  left: 16px;
-  top: 8px;
+#controls {
+  color: #111;
+  background-color: #eee;
+  border: 2px solid #000;
+  border-radius: 4px;
+  min-width: 284px;
+  left: 32px;
+  top: 18px;
 }
 
-button:nth-of-type(2) {
-  left: 16px;
-  top: 38px;
+#dragbar {
+  color: white;
+  height: 22px;
+  width: calc(100% - 22px);
+  background-color: black;
+  margin-bottom: 16px;
+  cursor: grab;
+  position: relative;
+}
+
+#minimize {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 22px;
+  width: 22px;
+  background-color: #000;
+  cursor: pointer;
+}
+
+#minimize .minus {
+  position: absolute;
+  background-color: #fff;
+  top: 7px;
+  height: 6px;
+  width: 22px;
+}
+
+#minimize .plus {
+  position: absolute;
+  background-color: #fff;
+  left: 8px;
+  width: 6px;
+  height: 20px;
+}
+
+#controls .content {
+  margin: 16px;
 }

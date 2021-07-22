@@ -15,7 +15,7 @@ body {
   position: fixed;
 }
 
-.ui-box {
+.ui {
   position: fixed;
   z-index: 100;
 }
