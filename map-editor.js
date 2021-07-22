@@ -1,5 +1,6 @@
 import board from './js/gameboard.js';
-import {clamp, limitOncePerFrame} from './js/util.js';
+import {Terrain} from './js/terrain.js';
+import {clamp, constantCaseToTitleCase, limitOncePerFrame} from './js/util.js';
 import archipelago from './map-scripts/archipelago.js';
 import continents from './map-scripts/continents.js';
 
@@ -26,12 +27,23 @@ document.getElementById('archipelago')
 document.getElementById('continents')
     .addEventListener('click', () => continents(board, 0.25));
 
+// Initialize terrain dropdown.
+const TERRAIN_SELECT = document.getElementById('terrain-select');
+Object.entries(Terrain).forEach(([terrain, stats]) => {
+  if (stats.color) {  // TODO: Remove once all terrain types are implemented.
+    const option = document.createElement('option');
+    option.innerText = constantCaseToTitleCase(terrain);
+    option.value = terrain;
+    TERRAIN_SELECT.append(option);
+  }
+});
+
 // Handle tile clicks.
 board.addClickListener((event, tile) => {
   switch (event.button) {
     case 0:
       // Left click.
-      tile.terrain = 'MOUNTAIN';
+      tile.terrain = TERRAIN_SELECT.value;
       board.render();
       break;
     case 2:

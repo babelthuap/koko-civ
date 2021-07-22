@@ -20,7 +20,7 @@ body {
   z-index: 100;
 }
 
-button {
+button, select {
   cursor: pointer;
   border-radius: 16px;
   padding: 2px 8px;

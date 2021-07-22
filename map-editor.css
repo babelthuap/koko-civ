@@ -49,3 +49,7 @@
 #controls .content {
   margin: 16px;
 }
+
+button, select {
+  background-color: #fff;
+}

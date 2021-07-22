@@ -11,6 +11,10 @@ export const rand = (n) => Math.floor(Math.random() * n);
 export const randColor = () =>
     '#' + new Array(6).fill().map(() => rand(16).toString(16)).join('');
 
+/** Converts CONSTANT_CASE to "Title Case". */
+export const constantCaseToTitleCase = (str) => str.toLowerCase().replace(
+    /(^|_)(.)/g, (_, c1, c2) => (c1 && ' ') + c2.toUpperCase());
+
 /** Like Array.map, but for general Object properties. */
 const mapObject = (obj, callbackFn) => {
   const out = {};
