@@ -1,4 +1,5 @@
 import {compress, decompress} from './compression.js';
+import {registerDragCallbacks} from './globalDragHandler.js';
 import {clear, coordsToPosition, getInternalCoords, renderTile} from './renderUtils.js';
 import {clamp, limitOncePerFrame, mod} from './util.js';
 
@@ -189,7 +190,7 @@ function Gameboard() {
   /*******************/
 
   function rawRender() {
-    // Raw, non-rate-limited render. Never use this directly.
+    // Raw, non-rate-limited render. Always use inside limitOncePerFrame.
     clear(canvas);
     const topLeftIndex = coordsToPosition(view.leftX, view.topY, width);
     const bottomRightIndex = coordsToPosition(
@@ -255,64 +256,28 @@ function Gameboard() {
     canvas.addEventListener('contextmenu', event => event.preventDefault());
 
     // Enable click-and-drag to pan map.
-    let mousePressed = false;
-    let dragging = false;
-    const startDrag = {leftX: 0, topY: 0, layerX: 0, layerY: 0};
-    canvas.addEventListener('mousedown', (event) => {
-      switch (event.button) {
-        case 0:
-          // Left click.
-          mousePressed = true;
-          startDrag.leftX = view.leftX;
-          startDrag.topY = view.topY;
-          startDrag.layerX = event.layerX;
-          startDrag.layerY = event.layerY;
-          break;
-        case 2:
-          // Right click.
-          invokeClickListeners(event);
-          break;
-      }
-    });
-    canvas.addEventListener('mousemove', (event) => {
-      if (mousePressed) {
-        dragging = true;
+    let startDragLeftX;
+    let startDragTopY;
+    registerDragCallbacks(canvas, {
+      onDragStart: () => {
+        startDragLeftX = view.leftX;
+        startDragTopY = view.topY;
+      },
+      onDrag: (dx, dy) => {
         canvas.style.cursor = 'grabbing';
-        const dx = (event.layerX - startDrag.layerX) / view.scale;
-        const dy = (event.layerY - startDrag.layerY) / view.scale;
         updateView({
-          leftX: startDrag.leftX - dx,
-          topY: startDrag.topY - dy,
+          leftX: startDragLeftX - dx / view.scale,
+          topY: startDragTopY - dy / view.scale,
           scale: view.scale,
         });
-        render();
-      }
+        rawRender(); // Note that onDrag is already rate-limited.
+      },
+      onLeftClick: invokeClickListeners,
+      onRightClick: invokeClickListeners,
+      finalize: () => {
+        canvas.style.cursor = '';
+      },
     });
-    canvas.addEventListener('mouseup', (event) => {
-      switch (event.button) {
-        case 0:
-          // Left click: end dragging and invoke click listeners if the cursor
-          // has not moved much since mousedown.
-          const shouldInvokeClickListeners = (mousePressed && !dragging) ||
-              (Math.abs(event.layerX - startDrag.layerX) < 2 &&
-               Math.abs(event.layerY - startDrag.layerY) < 2);
-          finalizeDragging(event);
-          if (shouldInvokeClickListeners) {
-            invokeClickListeners(event);
-          }
-          break;
-        case 2:
-          // Right click: do nothing. This is already handled in mousedown.
-          break;
-      }
-    });
-    canvas.addEventListener('mouseleave', finalizeDragging);
-
-    function finalizeDragging(event) {
-      canvas.style.cursor = '';
-      mousePressed = false;
-      dragging = false;
-    }
 
     function invokeClickListeners(event) {
       const [tx, ty] = coordsToPosition(

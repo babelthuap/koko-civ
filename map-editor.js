@@ -1,4 +1,5 @@
 import board from './js/gameboard.js';
+import {registerDragCallbacks} from './js/globalDragHandler.js';
 import {Terrain} from './js/terrain.js';
 import {clamp, constantCaseToTitleCase, limitOncePerFrame} from './js/util.js';
 import archipelago from './map-scripts/archipelago.js';
@@ -53,40 +54,23 @@ board.addClickListener((event, tile) => {
   }
 });
 
-// Handle click-and-drag controls.
+// Handle click-and-drag for the controls window.
 const CONTROLS = document.getElementById('controls');
 const DRAGBAR = CONTROLS.querySelector('#dragbar');
-let mousePressed = false;
-let dragging = false;
-let controlsBox;
-let startDrag = {};
-DRAGBAR.addEventListener('mousedown', ({clientX, clientY}) => {
-  mousePressed = true;
-  controlsBox = CONTROLS.getBoundingClientRect();
-  startDrag = {clientX, clientY};
-  DRAGBAR.style.cursor = 'grabbing';
-});
-const repositionControls = (clientX, clientY) => {
-  dragging = true;
-  const dx = clientX - startDrag.clientX;
-  const dy = clientY - startDrag.clientY;
-  const {left, width, top, height} = controlsBox;
-  CONTROLS.style.left = `${
-      clamp(
-          controlsBox.left + dx, 0, window.innerWidth - controlsBox.width)}px`;
-  CONTROLS.style.top = `${
-      clamp(
-          controlsBox.top + dy, 0, window.innerHeight - controlsBox.height)}px`;
-};
-document.addEventListener('mousemove', ({clientX, clientY}) => {
-  if (mousePressed) {
-    limitOncePerFrame(repositionControls, clientX, clientY);
-  }
-});
-document.addEventListener('mouseup', () => {
-  mousePressed = false;
-  dragging = false;
-  DRAGBAR.style.cursor = '';
+let controlsBoundingBox;
+registerDragCallbacks(DRAGBAR, {
+  onDragStart: () => {
+    controlsBoundingBox = CONTROLS.getBoundingClientRect();
+    DRAGBAR.style.cursor = 'grabbing';
+  },
+  onDrag: (dx, dy) => {
+    const {left, width, top, height} = controlsBoundingBox;
+    CONTROLS.style.left = `${clamp(left + dx, 0, window.innerWidth - width)}px`;
+    CONTROLS.style.top = `${clamp(top + dy, 0, window.innerHeight - height)}px`;
+  },
+  finalize: () => {
+    DRAGBAR.style.cursor = '';
+  },
 });
 
 // Handle minimizing controls
