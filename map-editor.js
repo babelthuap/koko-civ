@@ -207,7 +207,7 @@ SAVE.addEventListener('click', () => {
   const blob = new Blob([board.save()], {type: 'text/json'});
   const el = document.createElement('a');
   el.href = URL.createObjectURL(blob);
-  el.download = 'map.json';
+  el.download = `map_${Date.now()}.json`;
   document.body.appendChild(el);
   el.click();
   el.remove();
