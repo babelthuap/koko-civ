@@ -2,7 +2,7 @@ import {limitOncePerFrame} from './util.js';
 
 // If the mouse moves less than this distance (measured in client pixels) both
 // vertically and horizontally, then interpret the action as a click.
-const CLICK_TOLERANCE = Math.round(window.innerWidth / 200);
+const CLICK_TOLERANCE = 10;
 
 // Drag state.
 let dragging = false;
