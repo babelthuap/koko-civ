@@ -71,6 +71,15 @@ function Gameboard() {
     attachListeners();
   }
 
+  /** Moves the board. */
+  function move({dx = 0, dy = 0, dScale = 0}) {
+    updateView({
+      leftX: view.leftX + dx,
+      topY: view.topY + dy,
+      scale: view.scale + dScale,
+    });
+  }
+
   /** Serializes the board. */
   function save() {
     return JSON.stringify([{width, height, wrap}, compress(tiles)]);
@@ -319,6 +328,7 @@ function Gameboard() {
   /*************************/
   return {
     init: init,
+    move: move,
     save: save,
     load: load,
     render: render,

@@ -6,6 +6,8 @@ import continents from './map-scripts/continents.js';
 // TODO: Persist params in localStorage.
 let params = {};
 
+let currentView;
+
 /** Enum of view states. */
 const View = {
   MAIN_MENU: 0,
@@ -14,6 +16,7 @@ const View = {
 const El = {
   GAMEBOARD: document.getElementById('gameboard'),
   MAIN_MENU: document.getElementById('main-menu'),
+  INGAME_MENU: document.getElementById('ingame-menu'),
 };
 
 const temporaryListeners = new Map();
@@ -32,6 +35,7 @@ function renderView(view) {
       (typeArgs, el) => typeArgs.forEach(
           (args, type) => el.removeEventListener(type, ...args)));
   temporaryListeners.clear();
+  currentView = view;
   switch (view) {
     case View.MAIN_MENU:
       requestAnimationFrame(renderMainMenu);
@@ -62,12 +66,23 @@ function renderMainMenu() {
   });
 
   // Render pretty background.
-  board.init({width: 20, height: 20, wrap: true});
+  board.init({width: 20, height: 10, wrap: true});
   forEachTile(board, (tile, x, y) => {
     const r = Math.random();
     tile.terrain = r < 0.3 ? 'SEA' : 'OCEAN';
   });
   board.render();
+  let prevT = performance.now();
+  const scrollBoard = (t) => {
+    board.move({dx: (t - prevT) * 5e-5});
+    board.render();
+    prevT = t;
+    if (currentView === View.MAIN_MENU) {
+      requestAnimationFrame(scrollBoard);
+    }
+  };
+  requestAnimationFrame(scrollBoard);
+
   show(El.GAMEBOARD);
 }
 
@@ -85,6 +100,9 @@ function renderGame() {
   }
   board.render();
   show(El.GAMEBOARD);
+  show(El.INGAME_MENU);
+  addTemporaryListener(
+      El.INGAME_MENU, 'click', () => renderView(View.MAIN_MENU));
   const gameState = {
     turn: 1,
   };

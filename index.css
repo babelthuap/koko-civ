@@ -47,3 +47,11 @@
   top: 50vh;
   transform: translate(-50%, -50%);
 }
+
+#ingame-menu {
+  left: 32px;
+  top: 16px;
+  border: 2px solid grey;
+  background-color: #00000080;
+  padding: 16px;
+}
