@@ -1,5 +1,38 @@
 // The base terrain types.
 export const Terrain = {
+  // Land, not eligible for features.
+  MOUNTAIN: {
+    color: '#714626',
+    moveCost: 3, defenseBonus: 100, food: 0, production: 1, gold: 0,
+  },
+  VOLCANO: {
+    moveCost: 3, defenseBonus: 80, food: 0, production: 3, gold: 0,
+  },
+  FLOOD_PLAIN: {
+    moveCost: 1, defenseBonus: 10, food: 3, production: 0, gold: 0,
+  },
+
+  // Land, eligible for features.
+  GRASSLAND: {
+    color: '#b1b54b',
+    moveCost: 1, defenseBonus: 10, food: 2, production: 0, gold: 0,
+  },
+  BONUS_GRASSLAND: {
+    moveCost: 1, defenseBonus: 10, food: 2, production: 1, gold: 0,
+  },
+  PLAINS: {
+    color: '#dabe5d',
+    moveCost: 1, defenseBonus: 10, food: 1, production: 1, gold: 0,
+  },
+  DESERT: {
+    color: '#fceea9',
+    moveCost: 1, defenseBonus: 10, food: 0, production: 1, gold: 0,
+  },
+  TUNDRA: {
+    color: '#eaf1db',
+    moveCost: 1, defenseBonus: 10, food: 1, production: 0, gold: 0,
+  },
+
   // Water.
   OCEAN: {
     color: '#3c9e84',
@@ -16,39 +49,6 @@ export const Terrain = {
   FRESHWATER_LAKE: {
     color: '#9eecbe',
     moveCost: 1, defenseBonus: 10, food: 2, production: 0, gold: 2,
-  },
-
-  // Land, eligible for features.
-  GRASSLAND: {
-    color: '#b1b54b',
-    moveCost: 1, defenseBonus: 10, food: 2, production: 0, gold: 0,
-  },
-  BONUS_GRASSLAND: {
-    moveCost: 1, defenseBonus: 10, food: 2, production: 1, gold: 0,
-  },
-  PLAINS: {
-    color: '#dabe5d',
-    moveCost: 1, defenseBonus: 10, food: 1, production: 1, gold: 0,
-  },
-  TUNDRA: {
-    color: '#eaf1db',
-    moveCost: 1, defenseBonus: 10, food: 1, production: 0, gold: 0,
-  },
-  DESERT: {
-    color: '#fceea9',
-    moveCost: 1, defenseBonus: 10, food: 0, production: 1, gold: 0,
-  },
-
-  // Land, not eligible for features.
-  FLOOD_PLAIN: {
-    moveCost: 1, defenseBonus: 10, food: 3, production: 0, gold: 0,
-  },
-  MOUNTAIN: {
-    color: '#714626',
-    moveCost: 3, defenseBonus: 100, food: 0, production: 1, gold: 0,
-  },
-  VOLCANO: {
-    moveCost: 3, defenseBonus: 80, food: 0, production: 3, gold: 0,
   },
 };
 

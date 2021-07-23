@@ -13,6 +13,7 @@ const HEIGHT_INPUT = document.getElementById('height');
 const PERSPECTIVE = document.getElementById('perspective');
 const WRAP = document.getElementById('wrap');
 const TERRAIN_SELECT = document.getElementById('terrain-select');
+const BRUSH_SIZE = document.getElementById('brush-size');
 const CONTROLS = document.getElementById('controls');
 const DRAGBAR = CONTROLS.querySelector('#dragbar');
 const MINIMIZE = CONTROLS.querySelector('#minimize');
@@ -77,13 +78,43 @@ WRAP.addEventListener('change', () => {
 // Handle key presses.
 document.addEventListener('keydown', (event) => {
   switch (event.key) {
-    case 'a':
-      updateBoardDimensions();
-      archipelago(board, 0.2);
+    case 'm':
+      TERRAIN_SELECT.value = 'MOUNTAIN';
+      break;
+    case 'g':
+      TERRAIN_SELECT.value = 'GRASSLAND';
+      break;
+    case 'p':
+      TERRAIN_SELECT.value = 'PLAINS';
+      break;
+    case 'd':
+      TERRAIN_SELECT.value = 'DESERT';
+      break;
+    case 't':
+      TERRAIN_SELECT.value = 'TUNDRA';
+      break;
+    case 'o':
+      TERRAIN_SELECT.value = 'OCEAN';
+      break;
+    case 's':
+      TERRAIN_SELECT.value = 'SEA';
       break;
     case 'c':
-      updateBoardDimensions();
-      continents(board, 0.25);
+      TERRAIN_SELECT.value = 'COAST';
+      break;
+    case 'f':
+      TERRAIN_SELECT.value = 'FRESHWATER_LAKE';
+      break;
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+      BRUSH_SIZE.value = event.key;
       break;
     default:
       board.handleKeydown(event);
@@ -101,6 +132,7 @@ document.getElementById('continents').addEventListener('click', () => {
 });
 
 // Initialize terrain dropdown.
+TERRAIN_SELECT.innerHTML = '';
 Object.entries(Terrain).forEach(([terrain, stats]) => {
   if (stats.color) {  // TODO: Remove once all terrain types are implemented.
     const option = document.createElement('option');
@@ -111,11 +143,26 @@ Object.entries(Terrain).forEach(([terrain, stats]) => {
 });
 
 // Handle tile clicks.
-board.addClickListener((event, tile) => {
+board.addClickListener((event, tile, x, y) => {
   switch (event.button) {
     case 0:
       // Left click.
-      tile.terrain = TERRAIN_SELECT.value;
+      const terrain = TERRAIN_SELECT.value;
+      if (tile) {
+        tile.terrain = terrain;
+      }
+      const paintNeighbors = (x, y, radius) => {
+        if (radius > 1) {
+          for (const [nx, ny] of board.getAdjacentCoordinates(x, y)) {
+            const neighbor = board.getTile(nx, ny);
+            if (neighbor) {
+              neighbor.terrain = terrain;
+              paintNeighbors(nx, ny, radius - 1);
+            }
+          }
+        }
+      };
+      paintNeighbors(x, y, parseInt(BRUSH_SIZE.value));
       board.render();
       break;
     case 2:

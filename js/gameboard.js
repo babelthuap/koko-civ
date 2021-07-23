@@ -136,6 +136,8 @@ function Gameboard() {
    * The listener callback receives 2 arguments:
    *   - event: The normal MouseEvent.
    *   - tile: The tile that was clicked on. May be undefined.
+   *   - x: The x coordinate of the clicked tile.
+   *   - y: The y coordinate of the clicked tile.
    */
   function addClickListener(callback) {
     clickListeners.push(callback);
@@ -295,7 +297,7 @@ function Gameboard() {
           coordsToPosition(x, view.topY + event.offsetY / view.scale, width);
       const tile = getTile(tx, ty);
       if (tile) {
-        clickListeners.forEach(callback => callback(event, tile));
+        clickListeners.forEach(callback => callback(event, tile, tx, ty));
       }
     }
   }
