@@ -177,7 +177,8 @@ LOAD.addEventListener('click', () => {
       reader.addEventListener('load', (e) => {
         const json = e.target.result;
         board.load(json);
-        params.set({wrap: board.wrap});
+        params.set(
+            {width: board.width, height: board.height, wrap: board.wrap});
         board.render();
       });
       reader.readAsText(file);
