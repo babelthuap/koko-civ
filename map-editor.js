@@ -217,6 +217,7 @@ SAVE.addEventListener('click', () => {
 LOAD.addEventListener('click', () => {
   const uploader = document.createElement('input');
   uploader.type = 'file';
+  uploader.accept = '.json';
   uploader.addEventListener('change', () => {
     const file = uploader.files[0];
     if (file) {
