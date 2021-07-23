@@ -15,6 +15,7 @@ const View = {
 
 const El = {
   GAMEBOARD: document.getElementById('gameboard'),
+  BACKDROP: document.getElementById('backdrop'),
   MAIN_MENU: document.getElementById('main-menu'),
   INGAME_MENU: document.getElementById('ingame-menu'),
 };
@@ -47,6 +48,7 @@ function renderView(view) {
 }
 
 function renderMainMenu() {
+  show(El.BACKDROP);
   show(El.MAIN_MENU);
 
   // Handle buttons.
@@ -74,7 +76,7 @@ function renderMainMenu() {
   board.render();
   let prevT = performance.now();
   const scrollBoard = (t) => {
-    board.move({dx: (t - prevT) * 5e-5});
+    board.move({dx: (t - prevT) * 7e-5});
     board.render();
     prevT = t;
     if (currentView === View.MAIN_MENU) {

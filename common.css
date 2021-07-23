@@ -32,3 +32,9 @@ button, select {
   padding: 2px 8px;
   font-family: Arial, sans-serif;
 }
+
+#backdrop {
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(8px);
+}
