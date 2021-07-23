@@ -2,14 +2,14 @@ import {Terrain} from './terrain.js';
 import {mod} from './util.js';
 
 // The width of each hex in internal coordinates. (The height is 1.)
-const HEX_WIDTH = Math.sqrt(3);
+export const HEX_WIDTH = Math.sqrt(3);
 const HEX_WIDTH_INV = 1 / HEX_WIDTH;
 const HEX_WIDTH_2 = HEX_WIDTH / 2;
 const HEX_WIDTH_2_INV = 2 / HEX_WIDTH;
 
 /**
- * Given the internal coordinates of a point, determines the position of the
- * tile that contains that point.
+ * Given the internal coordinates of a point, determines the position (i.e.
+ * column & row) of the tile that contains that point.
  */
 export function coordsToPosition(x, y, width) {
   // Conceptually, we break up each hex into quarter-heights and half-widths.
@@ -67,10 +67,10 @@ export function clear(canvas) {
 }
 
 /**
- * Converts from a tile's position to the internal coordinates of the upper-left
- * corner of its bounding box.
+ * Converts from a tile's position (i.e. column & row) to the internal
+ * coordinates of the upper-left corner of its bounding box.
  */
-export function getInternalCoords(tx, ty) {
+export function positionToCoords(tx, ty) {
   return (ty & 1) === 0 ?
       [HEX_WIDTH * tx, 0.75 * ty] :
       [HEX_WIDTH * tx + HEX_WIDTH_2, 0.75 * (ty - 1) + 0.75];
@@ -86,7 +86,7 @@ export function renderTile(tile, x, y, view, canvas) {
       (tile.terrain in Terrain) ? Terrain[tile.terrain].color : '#f0f';
   drawHex(
       canvas, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
-      HEX_WIDTH * view.scale, view.scale, color);
+      HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, color);
 }
 
 /**

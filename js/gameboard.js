@@ -1,6 +1,6 @@
 import {compress, decompress} from './compression.js';
 import {registerDragCallbacks} from './globalDragHandler.js';
-import {clear, coordsToPosition, getInternalCoords, renderTile} from './renderUtils.js';
+import {clear, coordsToPosition, HEX_WIDTH, positionToCoords, renderTile} from './renderUtils.js';
 import {clamp, limitOncePerFrame, mod} from './util.js';
 
 // TODO: Globe view!
@@ -65,8 +65,8 @@ function Gameboard() {
     height = options.height;
     wrap = options.wrap;
     tiles = new Array(width * height).fill().map(() => ({terrain: 'OCEAN'}));
-    coordWidth = getInternalCoords(width, 0)[0];
-    coordHeight = getInternalCoords(0, height - 1)[1] + 1;
+    coordWidth = positionToCoords(width, 0)[0];
+    coordHeight = positionToCoords(0, height - 1)[1] + 1;
     updateView({leftX: 0, topY: 0, scale: 0});
     attachListeners();
   }
@@ -77,6 +77,16 @@ function Gameboard() {
       leftX: view.leftX + dx,
       topY: view.topY + dy,
       scale: view.scale + dScale,
+    });
+  }
+
+  /** Centers the board on the given position. */
+  function centerOn(tx, ty) {
+    const [x, y] = positionToCoords(tx, ty);
+    updateView({
+      leftX: x + 0.5 * (HEX_WIDTH - window.innerWidth / view.scale),
+      topY: y + 0.5 * (1 - window.innerHeight / view.scale),
+      scale: view.scale,
     });
   }
 
@@ -99,8 +109,8 @@ function Gameboard() {
     height = options.height;
     wrap = options.wrap;
     tiles = decompressedTiles;
-    coordWidth = getInternalCoords(width, 0)[0];
-    coordHeight = getInternalCoords(0, height - 1)[1] + 1;
+    coordWidth = positionToCoords(width, 0)[0];
+    coordHeight = positionToCoords(0, height - 1)[1] + 1;
     updateView({leftX: 0, topY: 0, scale: 0});
     attachListeners();
   }
@@ -221,7 +231,7 @@ function Gameboard() {
           continue;
         }
         const tile = tiles[width * ty + mod(tx, width)];
-        const [x, y] = getInternalCoords(tx, ty);
+        const [x, y] = positionToCoords(tx, ty);
         renderTile(tile, x, y, view, canvas);
       }
     }
@@ -329,6 +339,7 @@ function Gameboard() {
   return {
     init: init,
     move: move,
+    centerOn: centerOn,
     save: save,
     load: load,
     render: render,
