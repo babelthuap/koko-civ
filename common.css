@@ -9,6 +9,7 @@ html, body {
 body {
   background-color: #000;
   overflow: hidden;
+  font-family: Arial, sans-serif;
 }
 
 #gameboard {
@@ -28,4 +29,5 @@ button, select {
   cursor: pointer;
   border-radius: 16px;
   padding: 2px 8px;
+  font-family: Arial, sans-serif;
 }
