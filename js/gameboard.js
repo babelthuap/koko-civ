@@ -333,5 +333,8 @@ function Gameboard() {
     get height() {
       return height;
     },
+    get wrap() {
+      return wrap;
+    },
   };
 }

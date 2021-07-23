@@ -6,6 +6,8 @@ import archipelago from './map-scripts/archipelago.js';
 import continents from './map-scripts/continents.js';
 
 // Elements.
+const SAVE = document.getElementById('save');
+const LOAD = document.getElementById('load');
 const WIDTH_INPUT = document.getElementById('width');
 const HEIGHT_INPUT = document.getElementById('height');
 const PERSPECTIVE = document.getElementById('perspective');
@@ -22,7 +24,6 @@ const params = (() => {
   const json = localStorage['KOKO_CIV.map_editor_params'];
   return json ? JSON.parse(json) : {};
 })();
-updateUI();
 
 // Updates parameters and syncs them with localStorage.
 params.set = (patch) => {
@@ -32,6 +33,11 @@ params.set = (patch) => {
   localStorage['KOKO_CIV.map_editor_params'] = JSON.stringify(params);
   updateUI();
 };
+
+// Display an initial map.
+updateUI();
+updateBoardDimensions();
+continents(board, 0.25);
 
 // Sync the current params to the UI.
 function updateUI() {
@@ -58,14 +64,12 @@ function updateBoardDimensions() {
 // Toggle perspective.
 PERSPECTIVE.addEventListener('change', () => {
   params.set({perspective: PERSPECTIVE.checked});
-  updateUI();
   board.render();
 });
 
 // Toggle wrap.
 WRAP.addEventListener('change', () => {
   params.set({wrap: WRAP.checked});
-  updateUI();
   board.setWrap(params.wrap);
   board.render();
 });
@@ -151,9 +155,38 @@ MINIMIZE.addEventListener('mousedown', () => {
   }
 });
 
+// Handle save.
+SAVE.addEventListener('click', () => {
+  const blob = new Blob([board.save()], {type: 'text/json'});
+  const el = document.createElement('a');
+  el.href = URL.createObjectURL(blob);
+  el.download = 'map.json';
+  document.body.appendChild(el);
+  el.click();
+  el.remove();
+});
+
+// Handle load.
+LOAD.addEventListener('click', () => {
+  const uploader = document.createElement('input');
+  uploader.type = 'file';
+  uploader.addEventListener('change', () => {
+    const file = uploader.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.addEventListener('load', (e) => {
+        const json = e.target.result;
+        board.load(json);
+        params.set({wrap: board.wrap});
+        board.render();
+      });
+      reader.readAsText(file);
+    }
+  });
+  document.body.appendChild(uploader);
+  uploader.click();
+  document.body.removeChild(uploader);
+});
+
 // Expose board
 window.board = board;
-
-// Display an initial map.
-updateBoardDimensions();
-continents(board, 0.25);
