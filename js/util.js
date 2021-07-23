@@ -11,6 +11,12 @@ export const rand = (n) => Math.floor(Math.random() * n);
 export const randColor = () =>
     '#' + new Array(6).fill().map(() => rand(16).toString(16)).join('');
 
+/** Hides an element. */
+export const hide = (el) => el.style.display = 'none';
+
+/** Shows an element. */
+export const show = (el) => el.style.display = '';
+
 /** Converts CONSTANT_CASE to "Title Case". */
 export const constantCaseToTitleCase = (str) => str.toLowerCase().replace(
     /(^|_)(.)/g, (_, c1, c2) => (c1 && ' ') + c2.toUpperCase());

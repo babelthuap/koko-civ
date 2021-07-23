@@ -14,6 +14,7 @@ body {
 
 #gameboard {
   position: fixed;
+  z-index: 1;
 }
 
 .perspective #gameboard {

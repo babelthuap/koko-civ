@@ -1,5 +1,13 @@
 /* Styles that only apply to index (the main game). */
 
+#loading {
+  position: fixed;
+  left: 50vw;
+  top: 50vh;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+
 #main-menu {
   color: #111;
   background-color: #eee;
@@ -30,4 +38,12 @@
 #main-menu .cow::before {
   content: "🐄";
   font-size: 80px;
+}
+
+#loading {
+  color: #fff;
+  font-size: 32px;
+  left: 50vw;
+  top: 50vh;
+  transform: translate(-50%, -50%);
 }
