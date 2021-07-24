@@ -117,7 +117,11 @@ function Gameboard() {
 
   /** Renders the gameboard. */
   function render() {
-    limitOncePerFrame(rawRender);
+    try {
+      limitOncePerFrame(rawRender);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   /** Sets wrap on or off. */

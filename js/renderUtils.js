@@ -1,3 +1,4 @@
+import {Image} from './images.js';
 import {Terrain} from './terrain.js';
 import {mod} from './util.js';
 
@@ -6,6 +7,8 @@ export const HEX_WIDTH = Math.sqrt(3);
 const HEX_WIDTH_INV = 1 / HEX_WIDTH;
 const HEX_WIDTH_2 = HEX_WIDTH / 2;
 const HEX_WIDTH_2_INV = 2 / HEX_WIDTH;
+
+const GRASSLAND_IMG = document.getElementById('grassland');
 
 /**
  * Given the internal coordinates of a point, determines the position (i.e.
@@ -82,11 +85,24 @@ export function positionToCoords(tx, ty) {
  */
 export function renderTile(tile, x, y, view, canvas) {
   // Terrain
-  const color =
-      (tile.terrain in Terrain) ? Terrain[tile.terrain].color : '#f0f';
-  drawHex(
-      canvas, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
-      HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, color);
+  if (tile.terrain in Image) {
+    const ctx = canvas.getContext('2d');
+    const img = Image[tile.terrain];
+    const imgWidth = img.width;
+    const imgHeight = img.height;
+    ctx.drawImage(
+        img,
+        (x - HEX_WIDTH * 50/imgWidth - view.leftX) * view.scale,
+        (y - 50/imgHeight - view.topY) * view.scale,
+        HEX_WIDTH * view.scale * (imgWidth + 100)/imgWidth,
+        /* hex height == 1 */ view.scale * (imgHeight + 100)/imgHeight);
+  } else {
+    const color =
+        (tile.terrain in Terrain) ? Terrain[tile.terrain].color : '#f0f';
+    drawHex(
+        canvas, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
+        HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, color);
+  }
 }
 
 /**
