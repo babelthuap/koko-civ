@@ -97,7 +97,7 @@ function handleTurn({player}) {
         setActiveUnitIndex(mod(unitIndex + 1, playerUnitLocations.length));
         board.centerOn(activeUnitLocation.x, activeUnitLocation.y);
         return board.render();
-      case 'c':
+      case 'KeyC':
         board.centerOn(activeUnitLocation.x, activeUnitLocation.y);
         return board.render();
       case 'Numpad1':
