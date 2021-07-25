@@ -1,6 +1,6 @@
 import {compress, decompress} from './compression.js';
 import {registerDragCallbacks} from './globalDragHandler.js';
-import {clear, coordsToPosition, HEX_WIDTH, positionToCoords, renderTile} from './renderUtils.js';
+import {clear, coordsToPosition, HEX_WIDTH, positionToCoords, renderGrid, renderTerrain, renderUnit} from './renderUtils.js';
 import {clamp, limitOncePerFrame, mod} from './util.js';
 
 // TODO: Globe view!
@@ -49,6 +49,7 @@ function Gameboard() {
     leftX: 0,
     topY: 0,
     scale: 100,  // pixels per unit (of internal coordinates)
+    showGrid: false,
   };
 
 
@@ -102,6 +103,11 @@ function Gameboard() {
       topY: y + 0.5 * (1 - window.innerHeight / scale),
       scale: scale,
     });
+  }
+
+  /** Toggles the grid overlay. */
+  function toggleGrid() {
+    view.showGrid = !view.showGrid;
   }
 
   /** Serializes the board. */
@@ -204,6 +210,9 @@ function Gameboard() {
   /** Handles a keydown event. */
   function handleKeydown(event) {
     switch (event.key) {
+      case 't':
+        toggleGrid();
+        return render();
       case 'ArrowDown':
         updateView({leftX: view.leftX, topY: view.topY + 1, scale: view.scale});
         return render();
@@ -248,6 +257,11 @@ function Gameboard() {
 
     // Raw, non-rate-limited render. Always use inside limitOncePerFrame.
     clear(canvas, ctx);
+
+    const locations = [];
+    const unitLocations = [];
+
+    // Render terrain.
     const topLeftIndex = coordsToPosition(view.leftX, view.topY, width);
     const bottomRightIndex = coordsToPosition(
         view.leftX + canvas.width / view.scale,
@@ -262,8 +276,26 @@ function Gameboard() {
         }
         const tile = tiles[width * ty + mod(tx, width)];
         const [x, y] = positionToCoords(tx, ty);
-        renderTile(tile, x, y, view, ctx);
+        renderTerrain(tile, x, y, view, ctx);
+        if (view.showGrid) {
+          locations.push([x, y])
+        }
+        if (tile.units.length > 0) {
+          unitLocations.push({unit: tile.units, x, y});
+        }
       }
+    }
+
+    // Render grid.
+    if (view.showGrid) {
+      for (const [x, y] of locations) {
+        renderGrid(x, y, view, ctx);
+      }
+    }
+
+    // Render units.
+    for (const {unit, x, y} of unitLocations) {
+      renderUnit(unit, x, y, view, ctx);
     }
 
     // Uncomment to enable render timing.
@@ -374,20 +406,21 @@ function Gameboard() {
   /* EXPOSE PUBLIC METHODS */
   /*************************/
   return {
-    init: init,
-    move: move,
-    centerOn: centerOn,
-    save: save,
-    load: load,
-    render: render,
-    setWrap: setWrap,
-    getTile: getTile,
-    forEachTile: forEachTile,
-    getAdjacentCoordinates: getAdjacentCoordinates,
-    addClickListener: addClickListener,
-    removeClickListener: removeClickListener,
-    clearClickListeners: clearClickListeners,
-    handleKeydown: handleKeydown,
+    init,
+    move,
+    centerOn,
+    toggleGrid,
+    save,
+    load,
+    render,
+    setWrap,
+    getTile,
+    forEachTile,
+    getAdjacentCoordinates,
+    addClickListener,
+    removeClickListener,
+    clearClickListeners,
+    handleKeydown,
     get width() {
       return width;
     },

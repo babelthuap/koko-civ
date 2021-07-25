@@ -82,7 +82,7 @@ export function positionToCoords(tx, ty) {
  * Renders the specified view of a single tile onto a canvas given the
  * upper-left corner of its bounding box in internal coordinates.
  */
-export function renderTile(tile, x, y, view, ctx) {
+export function renderTerrain(tile, x, y, view, ctx) {
   // Terrain
   if (tile.terrain in Image) {
     const img = Image[tile.terrain];
@@ -98,27 +98,33 @@ export function renderTile(tile, x, y, view, ctx) {
         (tile.terrain in Terrain) ? Terrain[tile.terrain].color : '#f0f';
     drawHex(
         ctx, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
-        HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, color);
+        HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, color,
+        /* fill= */ true);
   }
+}
 
-  // Units
-  // TODO: render units!
-  if (tile.units && tile.units.length > 0) {
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(
-        (x + 0.5 * HEX_WIDTH - view.leftX) * view.scale,
-        (y + 0.5 - view.topY) * view.scale, view.scale / 2, 0, Math.PI * 2);
-    ctx.fill();
-  }
+export function renderGrid(x, y, view, ctx) {
+  drawHex(
+        ctx, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
+        HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, '#aaa',
+        /* fill= */ false);
+}
+
+export function renderUnit(unit, x, y, view, ctx) {
+  ctx.fillStyle = 'red';
+  ctx.beginPath();
+  ctx.arc(
+      (x + 0.5 * HEX_WIDTH - view.leftX) * view.scale,
+      (y + 0.5 - view.topY) * view.scale, view.scale / 2, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 /**
  * Draws a vertical hex on the canvas given: the upper-left corner of its
  * bounding box, its width, its height, and its color.
  */
-function drawHex(ctx, x, y, width, height, color) {
-  ctx.fillStyle = color;
+function drawHex(ctx, x, y, width, height, color, fill) {
+  ctx.strokeStyle = color;
   ctx.beginPath();
   const midX = x + width * 0.5;
   const maxX = x + width;
@@ -131,5 +137,9 @@ function drawHex(ctx, x, y, width, height, color) {
   ctx.lineTo(x, y3_4);
   ctx.lineTo(x, y_4);
   ctx.lineTo(midX, y);
-  ctx.fill();
+  if (fill) {
+    ctx.fill();
+  } else {
+    ctx.stroke();
+  }
 }

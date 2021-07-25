@@ -56,7 +56,7 @@ function cleanUp() {
 function handleTurn({player}) {
   // Iterate through units.
   for (const unitLocation of state.playerObjects[player].units) {
-    const {unit, x, y} = unitLocation;
+    const {x, y} = unitLocation;
     board.centerOn(x, y, /* scale= */ 125);
 
     addTemporaryListener(document, 'keydown', event => {
@@ -110,6 +110,8 @@ function handleTurn({player}) {
           unitLocation.y--;
           board.getTile(unitLocation.x, unitLocation.y).units.push(unit);
           return board.render();
+        default:
+          return board.handleKeydown(event);
       }
     });
   }
