@@ -53,7 +53,21 @@ function cleanUp() {
   removeTemporaryListeners();
 }
 
+function updateVisibility(player) {
+  board.forEachTile(tile => tile.canSee.clear());
+  for (const {unit, x, y} of state.playerObjects[player].units) {
+    board.getTile(x, y).canSee.add(unit);
+    board.getTile(x, y).hasSeen.add(player);
+    for (const [nx, ny] of board.getAdjacentCoordinates(x, y)) {
+      board.getTile(nx, ny).canSee.add(unit);
+      board.getTile(nx, ny).hasSeen.add(player);
+    }
+  }
+}
+
 function handleTurn({player}) {
+  updateVisibility(player);
+
   // Iterate through units.
   for (const unitLocation of state.playerObjects[player].units) {
     const {x, y} = unitLocation;
@@ -70,6 +84,7 @@ function handleTurn({player}) {
           }
           unitLocation.y++;
           board.getTile(unitLocation.x, unitLocation.y).units.push(unit);
+          updateVisibility(player);
           return board.render();
         case 'Numpad3':
           board.getTile(x, y).units =
@@ -79,18 +94,21 @@ function handleTurn({player}) {
           }
           unitLocation.y++;
           board.getTile(unitLocation.x, unitLocation.y).units.push(unit);
+          updateVisibility(player);
           return board.render();
         case 'Numpad4':
           board.getTile(x, y).units =
               board.getTile(x, y).units.filter(other => other !== unit);
           unitLocation.x--;
           board.getTile(unitLocation.x, y).units.push(unit);
+          updateVisibility(player);
           return board.render();
         case 'Numpad6':
           board.getTile(x, y).units =
               board.getTile(x, y).units.filter(other => other !== unit);
           unitLocation.x++;
           board.getTile(unitLocation.x, y).units.push(unit);
+          updateVisibility(player);
           return board.render();
         case 'Numpad7':
           board.getTile(x, y).units =
@@ -100,6 +118,7 @@ function handleTurn({player}) {
           }
           unitLocation.y--;
           board.getTile(unitLocation.x, unitLocation.y).units.push(unit);
+          updateVisibility(player);
           return board.render();
         case 'Numpad9':
           board.getTile(x, y).units =
@@ -109,6 +128,7 @@ function handleTurn({player}) {
           }
           unitLocation.y--;
           board.getTile(unitLocation.x, unitLocation.y).units.push(unit);
+          updateVisibility(player);
           return board.render();
         default:
           return board.handleKeydown(event);

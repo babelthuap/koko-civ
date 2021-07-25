@@ -1,3 +1,5 @@
+import {mapObject} from './util.js';
+
 export const Image = {
   GRASSLAND: document.getElementById('grassland'),
   PLAINS: document.getElementById('plains'),
@@ -6,3 +8,23 @@ export const Image = {
   OCEAN: document.getElementById('ocean'),
   MOUNTAIN: document.getElementById('mountain'),
 };
+
+export const ImageDarker = mapObject(Image, darken);
+
+function darken(img) {
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const imageData = ctx.getImageData(0, 0, img.width, img.height);
+  const pixels = imageData.data;
+  // Darken the RGB of each pixel.
+  for (let i = 0; i < pixels.length; i += 4) {
+    pixels[i] = pixels[i] * 0.5;
+    pixels[i + 1] = pixels[i + 1] * 0.5;
+    pixels[i + 2] = pixels[i + 2] * 0.5;
+  }
+  ctx.putImageData(imageData, 0, 0);
+  return canvas;
+}

@@ -22,7 +22,7 @@ export const constantCaseToTitleCase = (str) => str.toLowerCase().replace(
     /(^|_)(.)/g, (_, c1, c2) => (c1 && ' ') + c2.toUpperCase());
 
 /** Like Array.map, but for general Object properties. */
-const mapObject = (obj, callbackFn) => {
+export const mapObject = (obj, callbackFn) => {
   const out = {};
   for (let key in obj) {
     out[key] = callbackFn(obj[key], key, obj);

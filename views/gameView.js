@@ -37,6 +37,7 @@ function initNewGame(renderView, gameSetup) {
     default:
       throw 'no map script set';
   }
+  board.revealAll(false);
   board.render();
 
   // TESTING //

@@ -50,6 +50,7 @@ function Gameboard() {
     topY: 0,
     scale: 100,  // pixels per unit (of internal coordinates)
     showGrid: false,
+    revealAll: true,
   };
 
 
@@ -65,8 +66,8 @@ function Gameboard() {
    * Each tile has the following stardard properties:
    *   - terrain: a terrain type (see terrain.js)
    *   - resource: a resource type (may be undefined)
-   *   - canSee: an array of the players who can *currently* see the tile
-   *   - hasSeen: an array of the players who have seen the tile in the past
+   *   - canSee: a set of the *units* that can currently see the tile
+   *   - hasSeen: a set of the *players* who have seen the tile in the past
    *   - units: an array of the units occupying the tile
    *   - city: the city in the tile (may be undefined)
    */
@@ -76,8 +77,8 @@ function Gameboard() {
     wrap = options.wrap;
     tiles = new Array(width * height).fill().map(() => ({
                                                    terrain: 'OCEAN',
-                                                   canSee: [],
-                                                   hasSeen: [],
+                                                   canSee: new Set(),
+                                                   hasSeen: new Set(),
                                                    units: [],
                                                  }));
     coordWidth = positionToCoords(width, 0)[0];
@@ -110,8 +111,16 @@ function Gameboard() {
     view.showGrid = !view.showGrid;
   }
 
+  /** Toggles full map visibility. */
+  function revealAll(shouldRevealAll) {
+    view.revealAll = shouldRevealAll;
+  }
+
   /** Serializes the board. */
   function save() {
+    Set.prototype.toJSON = function() {
+      return [...this];
+    };
     return JSON.stringify([{width, height, wrap}, compress(tiles)]);
   }
 
@@ -133,8 +142,8 @@ function Gameboard() {
     coordHeight = positionToCoords(0, height - 1)[1] + 1;
 
     tiles.forEach(tile => {
-      if (!tile.canSee) tile.canSee = [];
-      if (!tile.hasSeen) tile.hasSeen = [];
+      tile.canSee = new Set(tile.canSee || []);
+      tile.hasSeen = new Set(tile.hasSeen || []);
       if (!tile.units) tile.units = [];
     });
 
@@ -147,7 +156,7 @@ function Gameboard() {
     try {
       limitOncePerFrame(rawRender);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 
@@ -282,13 +291,17 @@ function Gameboard() {
           continue;
         }
         const tile = tiles[width * ty + mod(tx, width)];
-        const [x, y] = positionToCoords(tx, ty);
-        renderTerrain(tile, x, y, view, ctx);
-        if (view.showGrid) {
-          locations.push([x, y])
-        }
-        if (tile.units.length > 0) {
-          unitLocations.push({unit: tile.units, x, y});
+        if (tile.hasSeen.has(0) || view.revealAll) {
+          const [x, y] = positionToCoords(tx, ty);
+          if (view.showGrid) {
+            locations.push([x, y])
+          }
+          const canSee =
+              [...tile.canSee].some(unit => unit.owner === 0) || view.revealAll;
+          renderTerrain(tile, x, y, view, ctx, canSee);
+          if (canSee && tile.units.length > 0) {
+            unitLocations.push({unit: tile.units, x, y});
+          }
         }
       }
     }
@@ -417,6 +430,7 @@ function Gameboard() {
     move,
     centerOn,
     toggleGrid,
+    revealAll,
     save,
     load,
     render,

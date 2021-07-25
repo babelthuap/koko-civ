@@ -1,4 +1,4 @@
-import {Image} from './images.js';
+import {Image, ImageDarker} from './images.js';
 import {Terrain} from './terrain.js';
 import {mod} from './util.js';
 
@@ -82,10 +82,10 @@ export function positionToCoords(tx, ty) {
  * Renders the specified view of a single tile onto a canvas given the
  * upper-left corner of its bounding box in internal coordinates.
  */
-export function renderTerrain(tile, x, y, view, ctx) {
+export function renderTerrain(tile, x, y, view, ctx, canSee) {
   // Terrain
   if (tile.terrain in Image) {
-    const img = Image[tile.terrain];
+    const img = canSee ? Image[tile.terrain] : ImageDarker[tile.terrain];
     const imgWidth = img.width;
     const imgHeight = img.height;
     ctx.drawImage(
