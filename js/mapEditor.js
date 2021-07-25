@@ -6,7 +6,26 @@ import {registerDragCallbacks} from './globalDragHandler.js';
 import {Terrain} from './terrain.js';
 import {clamp, constantCaseToTitleCase, limitOncePerFrame} from './util.js';
 
-export function init(rootEl) {
+export default {init, cleanUp};
+
+const temporaryListeners = new Map();
+
+const addTemporaryListener = (el, type, ...args) => {
+  el.addEventListener(type, ...args);
+  if (!temporaryListeners.has(el)) {
+    temporaryListeners.set(el, new Map());
+  }
+  temporaryListeners.get(el).set(type, args);
+};
+
+const removeTemporaryListeners = () => {
+  temporaryListeners.forEach(
+      (typeArgs, el) => typeArgs.forEach(
+          (args, type) => el.removeEventListener(type, ...args)));
+  temporaryListeners.clear();
+};
+
+function init(rootEl) {
   // Elements.
   const SAVE = rootEl.querySelector('#save');
   const LOAD = rootEl.querySelector('#load');
@@ -39,8 +58,6 @@ export function init(rootEl) {
 
   // Display an initial map.
   updateUI();
-  // updateBoardDimensions();
-  // continents(board, 0.25);
 
   // Sync the current params to the UI.
   function updateUI() {
@@ -60,26 +77,26 @@ export function init(rootEl) {
     params.set({
       width: clamp(parseInt(WIDTH_INPUT.value), 10, 512) || /* default= */ 100,
       height:
-          clamp(parseInt(HEIGHT_INPUT.value), 10, 512) || /* default= */ 130,
+          clamp(parseInt(HEIGHT_INPUT.value), 10, 512) || /* default= */ 100,
     });
     board.init(params);
   }
 
   // Toggle perspective.
-  PERSPECTIVE.addEventListener('change', () => {
+  addTemporaryListener(PERSPECTIVE, 'change', () => {
     params.set({perspective: PERSPECTIVE.checked});
     board.render();
   });
 
   // Toggle wrap.
-  WRAP.addEventListener('change', () => {
+  addTemporaryListener(WRAP, 'change', () => {
     params.set({wrap: WRAP.checked});
     board.setWrap(params.wrap);
     board.render();
   });
 
   // Handle key presses.
-  document.addEventListener('keydown', (event) => {
+  addTemporaryListener(document, 'keydown', (event) => {
     switch (event.key) {
       case 'm':
         TERRAIN_SELECT.value = 'MOUNTAIN';
@@ -125,11 +142,11 @@ export function init(rootEl) {
   });
 
   // Map generation controls.
-  rootEl.querySelector('#archipelago').addEventListener('click', () => {
+  addTemporaryListener(rootEl.querySelector('#archipelago'), 'click', () => {
     updateBoardDimensions();
     archipelago(board, 0.2);
   });
-  rootEl.querySelector('#continents').addEventListener('click', () => {
+  addTemporaryListener(rootEl.querySelector('#continents'), 'click', () => {
     updateBoardDimensions();
     continents(board, 0.25);
   });
@@ -196,7 +213,7 @@ export function init(rootEl) {
 
   // Handle minimizing controls
   let isMinimized = false;
-  MINIMIZE.addEventListener('mousedown', () => {
+  addTemporaryListener(MINIMIZE, 'mousedown', () => {
     isMinimized = !isMinimized;
     if (isMinimized) {
       CONTENT.style.display = 'none';
@@ -208,7 +225,7 @@ export function init(rootEl) {
   });
 
   // Handle save.
-  SAVE.addEventListener('click', () => {
+  addTemporaryListener(SAVE, 'click', () => {
     const blob = new Blob([board.save()], {type: 'text/json'});
     const el = document.createElement('a');
     el.href = URL.createObjectURL(blob);
@@ -219,7 +236,7 @@ export function init(rootEl) {
   });
 
   // Handle load.
-  LOAD.addEventListener('click', () => {
+  addTemporaryListener(LOAD, 'click', () => {
     const uploader = document.createElement('input');
     uploader.type = 'file';
     uploader.accept = '.json';
@@ -244,4 +261,9 @@ export function init(rootEl) {
 
   // Expose board
   window.board = board;
+}
+
+function cleanUp() {
+  board.clearClickListeners();
+  removeTemporaryListeners();
 }

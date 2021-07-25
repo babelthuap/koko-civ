@@ -1,9 +1,7 @@
-import {init} from '../js/mapEditor.js';
+import mapEditor from '../js/mapEditor.js';
 import {hide} from '../js/util.js';
 
-const MAP_EDITOR_HTML = `<link rel="stylesheet" type="text/css" href="css/mapEditor.css">
-<div id="gameboard"></div>
-<div class="ui" id="controls">
+const CONTROLS_HTML = `<div class="ui" id="controls">
   <div id="dragbar"></div>
   <div id="minimize">
     <div class="minus"></div>
@@ -30,9 +28,7 @@ const MAP_EDITOR_HTML = `<link rel="stylesheet" type="text/css" href="css/mapEdi
     <hr>
     <div>
       Draw:
-      <select id="terrain-select">
-        <option>Mountain</option>
-      </select>
+      <select id="terrain-select"></select>
     </div>
     <div>
       Brush size:
@@ -59,18 +55,33 @@ const MAP_EDITOR_HTML = `<link rel="stylesheet" type="text/css" href="css/mapEdi
       [experimental]
     </div>
   </div>
-</div>
-<script type="module" src="js/mapEditor.js"></script>`;
+</div>`;
 
-let mapEditorEl;
+let controlsEl;
 
-export function getMapEditorEl() {
-  if (!mapEditorEl) {
-    mapEditorEl = document.createElement('div');
-    hide(mapEditorEl);
-    mapEditorEl.innerHTML = MAP_EDITOR_HTML;
-    init(mapEditorEl);
-    document.body.append(mapEditorEl);
+export function initMapEditor(renderView) {
+  // One-time initialization.
+  if (!controlsEl) {
+    const mapEditorCss = document.createElement('link');
+    mapEditorCss.rel = 'stylesheet';
+    mapEditorCss.type = 'text/css';
+    mapEditorCss.href = 'css/mapEditor.css';
+    document.head.append(mapEditorCss);
+    controlsEl = document.createElement('div');
+    hide(controlsEl);
+    controlsEl.innerHTML = CONTROLS_HTML;
+    document.body.append(controlsEl);
+
+    // Handle navigation
+    controlsEl.querySelector('#return-to-main-menu')
+        .addEventListener('click', () => {
+          mapEditor.cleanUp();
+          renderView('MAIN_MENU');
+        });
   }
-  return mapEditorEl;
+
+  // Inittialize map editor logic.
+  mapEditor.init(controlsEl);
+
+  return controlsEl;
 }
