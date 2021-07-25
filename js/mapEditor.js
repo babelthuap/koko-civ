@@ -258,9 +258,6 @@ function init(rootEl) {
     uploader.click();
     uploader.remove();
   });
-
-  // Expose board
-  window.board = board;
 }
 
 function cleanUp() {

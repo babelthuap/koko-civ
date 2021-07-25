@@ -1,5 +1,7 @@
 import archipelago from '../map-scripts/archipelago.js';
 import continents from '../map-scripts/continents.js';
+
+import board from './js/gameboard.js';
 import {constructViewElFromHtml} from './viewUtil.js';
 
 export default {initNewGame};
