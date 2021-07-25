@@ -62,6 +62,7 @@ function init(renderView) {
     const r = Math.random();
     tile.terrain = r < 0.3 ? 'SEA' : 'OCEAN';
   });
+  board.revealAll(true);
   board.render();
   let prevT = performance.now();
   const scrollBoard = (t) => {

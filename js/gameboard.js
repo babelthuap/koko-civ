@@ -1,6 +1,6 @@
 import {compress, decompress} from './compression.js';
 import {registerDragCallbacks} from './globalDragHandler.js';
-import {clear, coordsToPosition, HEX_WIDTH, positionToCoords, renderGrid, renderTerrain, renderUnit} from './renderUtils.js';
+import {clear, coordsToPosition, HEX_WIDTH, positionToCoords, renderGrid, renderTerrain, renderUnitStack} from './renderUtils.js';
 import {clamp, limitOncePerFrame, mod} from './util.js';
 
 // TODO: Globe view!
@@ -50,7 +50,7 @@ function Gameboard() {
     topY: 0,
     scale: 100,  // pixels per unit (of internal coordinates)
     showGrid: false,
-    revealAll: true,
+    revealAll: false,
   };
 
 
@@ -300,7 +300,7 @@ function Gameboard() {
               [...tile.canSee].some(unit => unit.owner === 0) || view.revealAll;
           renderTerrain(tile, x, y, view, ctx, canSee);
           if (canSee && tile.units.length > 0) {
-            unitLocations.push({unit: tile.units, x, y});
+            unitLocations.push({units: tile.units, x, y});
           }
         }
       }
@@ -314,8 +314,8 @@ function Gameboard() {
     }
 
     // Render units.
-    for (const {unit, x, y} of unitLocations) {
-      renderUnit(unit, x, y, view, ctx);
+    for (const {units, x, y} of unitLocations) {
+      renderUnitStack(units, x, y, view, ctx);
     }
 
     // Uncomment to enable render timing.

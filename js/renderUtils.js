@@ -1,4 +1,4 @@
-import {Image, ImageDarker} from './images.js';
+import {TerrainDarker, TerrainImage, UnitImage} from './images.js';
 import {Terrain} from './terrain.js';
 import {mod} from './util.js';
 
@@ -84,8 +84,9 @@ export function positionToCoords(tx, ty) {
  */
 export function renderTerrain(tile, x, y, view, ctx, canSee) {
   // Terrain
-  if (tile.terrain in Image) {
-    const img = canSee ? Image[tile.terrain] : ImageDarker[tile.terrain];
+  if (tile.terrain in TerrainImage) {
+    const img =
+        canSee ? TerrainImage[tile.terrain] : TerrainDarker[tile.terrain];
     const imgWidth = img.width;
     const imgHeight = img.height;
     ctx.drawImage(
@@ -95,7 +96,7 @@ export function renderTerrain(tile, x, y, view, ctx, canSee) {
         /* hex height == 1 */ view.scale * (imgHeight + 100) / imgHeight);
   } else {
     const color =
-        (tile.terrain in Terrain) ? Terrain[tile.terrain].color : '#f0f';
+        (tile.terrain in Terrain) ? Terrain[tile.terrain].color : 'magenta';
     drawHex(
         ctx, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
         HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, color,
@@ -106,17 +107,29 @@ export function renderTerrain(tile, x, y, view, ctx, canSee) {
 export function renderGrid(x, y, view, ctx) {
   drawHex(
       ctx, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
-      HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, '#aaa',
+      HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, '#999',
       /* fill= */ false);
 }
 
-export function renderUnit(unit, x, y, view, ctx) {
-  ctx.fillStyle = 'red';
-  ctx.beginPath();
-  ctx.arc(
-      (x + 0.5 * HEX_WIDTH - view.leftX) * view.scale,
-      (y + 0.5 - view.topY) * view.scale, view.scale / 2, 0, Math.PI * 2);
-  ctx.fill();
+export function renderUnitStack(units, x, y, view, ctx) {
+  // Arbitrarily pick the first unit in the array.
+  const topUnit = units[0];
+  if (topUnit.type in UnitImage) {
+    const img = UnitImage[topUnit.type];
+    ctx.drawImage(
+        img,
+        (x - view.leftX + (HEX_WIDTH - 1) / 2) * view.scale,
+        (y - view.topY) * view.scale,
+        view.scale,
+        view.scale);
+  } else {
+    ctx.fillStyle = 'magenta';
+    ctx.beginPath();
+    ctx.arc(
+        (x + 0.5 * HEX_WIDTH - view.leftX) * view.scale,
+        (y + 0.5 - view.topY) * view.scale, view.scale / 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
 /**

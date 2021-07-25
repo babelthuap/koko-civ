@@ -46,7 +46,7 @@ function initNewGame(renderView, gameSetup) {
     x = rand(board.width);
     y = rand(board.height);
   } while (new Set(['OCEAN', 'SEA', 'COAST']).has(board.getTile(x, y).terrain));
-  board.getTile(x, y).units.push({type: 'scout', owner: 0});
+  board.getTile(x, y).units.push({type: 'SCOUT', owner: 0});
   // TESTING //
 
   game.init({

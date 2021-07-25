@@ -56,8 +56,10 @@ function init(rootEl) {
     updateUI();
   };
 
-  // Display an initial map.
+  // Show the map.
   updateUI();
+  board.revealAll(true);
+  board.render();
 
   // Sync the current params to the UI.
   function updateUI() {

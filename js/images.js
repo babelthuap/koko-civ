@@ -1,6 +1,6 @@
 import {mapObject} from './util.js';
 
-export const Image = {
+export const TerrainImage = {
   GRASSLAND: document.getElementById('grassland'),
   PLAINS: document.getElementById('plains'),
   COAST: document.getElementById('coast'),
@@ -9,7 +9,11 @@ export const Image = {
   MOUNTAIN: document.getElementById('mountain'),
 };
 
-export const ImageDarker = mapObject(Image, darken);
+export const UnitImage = {
+  SCOUT: document.getElementById('scout'),
+};
+
+export const TerrainDarker = mapObject(TerrainImage, darken);
 
 function darken(img) {
   const canvas = document.createElement('canvas');
