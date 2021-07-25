@@ -1,6 +1,6 @@
-/* Styles that only apply to map-editor. */
+/* Styles for the map editor. */
 
-#controls {
+#map-editor-controls {
   color: #111;
   background-color: #eee;
   border: 2px solid #000;
@@ -10,7 +10,7 @@
   top: 18px;
 }
 
-#dragbar {
+#map-editor-controls #dragbar {
   color: white;
   height: 22px;
   width: calc(100% - 22px);
@@ -20,7 +20,7 @@
   position: relative;
 }
 
-#minimize {
+#map-editor-controls #minimize {
   position: absolute;
   top: 0;
   right: 0;
@@ -30,7 +30,7 @@
   cursor: pointer;
 }
 
-#minimize .minus {
+#map-editor-controls #minimize .minus {
   position: absolute;
   background-color: #fff;
   top: 7px;
@@ -38,7 +38,7 @@
   width: 22px;
 }
 
-#minimize .plus {
+#map-editor-controls #minimize .plus {
   position: absolute;
   background-color: #fff;
   left: 8px;
@@ -46,19 +46,20 @@
   height: 20px;
 }
 
-#controls .content {
+#map-editor-controls .content {
   margin: 16px;
 }
 
-button, select {
+#map-editor-controls button,
+#map-editor-controls select {
   background-color: #fff;
 }
 
-#controls .content > div {
+#map-editor-controls .content > div {
   margin-bottom: 8px;
 }
 
-#controls .content input[type="number"] {
+#map-editor-controls .content input[type="number"] {
   margin-right: 8px;
   width: 47px;
 }

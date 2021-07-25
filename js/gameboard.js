@@ -60,12 +60,25 @@ function Gameboard() {
    * Initializes the board. The following options are supported:
    *   - width (number of columns)
    *   - height (number of rows)
+   *
+   * Each tile has the following stardard properties:
+   *   - terrain: a terrain type (see terrain.js)
+   *   - resource: a resource type (may be undefined)
+   *   - canSee: an array of the players who can *currently* see the tile
+   *   - hasSeen: an array of the players who have seen the tile in the past
+   *   - units: an array of the units occupying the tile
+   *   - city: the city in the tile (may be undefined)
    */
   function init(options) {
     width = options.width;
     height = options.height;
     wrap = options.wrap;
-    tiles = new Array(width * height).fill().map(() => ({terrain: 'OCEAN'}));
+    tiles = new Array(width * height).fill().map(() => ({
+                                                   terrain: 'OCEAN',
+                                                   canSee: [],
+                                                   hasSeen: [],
+                                                   units: [],
+                                                 }));
     coordWidth = positionToCoords(width, 0)[0];
     coordHeight = positionToCoords(0, height - 1)[1] + 1;
     updateView({leftX: 0, topY: 0, scale: 0});
@@ -82,12 +95,12 @@ function Gameboard() {
   }
 
   /** Centers the board on the given position. */
-  function centerOn(tx, ty) {
+  function centerOn(tx, ty, scale = view.scale) {
     const [x, y] = positionToCoords(tx, ty);
     updateView({
-      leftX: x + 0.5 * (HEX_WIDTH - window.innerWidth / view.scale),
-      topY: y + 0.5 * (1 - window.innerHeight / view.scale),
-      scale: view.scale,
+      leftX: x + 0.5 * (HEX_WIDTH - window.innerWidth / scale),
+      topY: y + 0.5 * (1 - window.innerHeight / scale),
+      scale: scale,
     });
   }
 
@@ -133,6 +146,15 @@ function Gameboard() {
   /** Gets the tile at the specified position. */
   function getTile(tx, ty) {
     return 0 <= ty && ty < height ? tiles[width * ty + tx] : undefined;
+  }
+
+  /** Iterates over all tiles. */
+  function forEachTile(iteratee) {
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        iteratee(getTile(x, y), x, y);
+      }
+    }
   }
 
   /** Gets the list of tile coordinates adjacent to the given coordinates. */
@@ -360,6 +382,7 @@ function Gameboard() {
     render: render,
     setWrap: setWrap,
     getTile: getTile,
+    forEachTile: forEachTile,
     getAdjacentCoordinates: getAdjacentCoordinates,
     addClickListener: addClickListener,
     removeClickListener: removeClickListener,

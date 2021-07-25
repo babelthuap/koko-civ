@@ -1,6 +1,5 @@
 import board from '../js/gameboard.js';
 import {hide} from '../js/util.js';
-import {forEachTile} from '../map-scripts/common.js';
 
 import {constructViewElFromHtml} from './viewUtil.js';
 
@@ -59,7 +58,7 @@ function init(renderView) {
 
   // Render pretty background.
   board.init({width: 20, height: 10, wrap: true});
-  forEachTile(board, (tile, x, y) => {
+  board.forEachTile((tile, x, y) => {
     const r = Math.random();
     tile.terrain = r < 0.3 ? 'SEA' : 'OCEAN';
   });

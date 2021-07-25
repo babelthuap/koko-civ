@@ -1,11 +1,11 @@
 import {rand} from '../js/util.js';
 
-import {drawCoastAndSea, drawLand, expandCoastlines, forEachTile} from './common.js';
+import {drawCoastAndSea, drawLand, expandCoastlines} from './common.js';
 
 export default function continents(board, landFraction) {
   let s = performance.now();
 
-  forEachTile(board, tile => tile.terrain = 'WATER');
+  board.forEachTile(tile => tile.terrain = 'WATER');
 
   // left
   for (let i = 0; i < 15; i++) {
@@ -45,7 +45,7 @@ function randStep(board) {
   for (let y = 0; y < board.height; y++) {
     nbrLandCounts[y] = new Array(board.width).fill(0);
   }
-  forEachTile(board, (tile, x, y) => {
+  board.forEachTile((tile, x, y) => {
     if (tile.terrain === 'LAND') {
       const nbrs = board.getAdjacentCoordinates(x, y);
       for (const [nx, ny] of nbrs) {
@@ -53,7 +53,7 @@ function randStep(board) {
       }
     }
   });
-  forEachTile(board, (tile, x, y) => {
+  board.forEachTile((tile, x, y) => {
     const count = nbrLandCounts[y][x];
     if (rand(6) + 1 < count) {
       tile.terrain = 'LAND';

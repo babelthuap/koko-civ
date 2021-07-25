@@ -35,7 +35,7 @@ function init(rootEl) {
   const WRAP = rootEl.querySelector('#wrap');
   const TERRAIN_SELECT = rootEl.querySelector('#terrain-select');
   const BRUSH_SIZE = rootEl.querySelector('#brush-size');
-  const CONTROLS = rootEl.querySelector('#controls');
+  const CONTROLS = rootEl.querySelector('#map-editor-controls');
   const DRAGBAR = CONTROLS.querySelector('#dragbar');
   const MINIMIZE = CONTROLS.querySelector('#minimize');
   const PLUS = MINIMIZE.querySelector('.plus');

@@ -100,6 +100,17 @@ export function renderTile(tile, x, y, view, ctx) {
         ctx, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
         HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, color);
   }
+
+  // Units
+  // TODO: render units!
+  if (tile.units && tile.units.length > 0) {
+    ctx.fillStyle = 'red';
+    ctx.beginPath();
+    ctx.arc(
+        (x + 0.5 * HEX_WIDTH - view.leftX) * view.scale,
+        (y + 0.5 - view.topY) * view.scale, view.scale / 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
 /**

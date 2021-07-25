@@ -4,7 +4,7 @@ import {constructViewElFromHtml} from './viewUtil.js';
 
 export default {init};
 
-const CONTROLS_HTML = `<div class="ui" id="controls">
+const CONTROLS_HTML = `<div class="ui" id="map-editor-controls">
   <div id="dragbar"></div>
   <div id="minimize">
     <div class="minus"></div>
