@@ -112,8 +112,8 @@ export function renderGrid(x, y, view, ctx) {
 }
 
 export function renderUnitStack(units, x, y, view, ctx) {
-  // Arbitrarily pick the first unit in the array.
-  const topUnit = units[0];
+  // Arbitrarily pick the last unit in the array.
+  const topUnit = units[units.length - 1];
   if (topUnit.type in UnitImage) {
     const img = UnitImage[topUnit.type];
     ctx.drawImage(

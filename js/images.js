@@ -11,6 +11,7 @@ export const TerrainImage = {
 
 export const UnitImage = {
   SCOUT: document.getElementById('scout'),
+  SETTLER: document.getElementById('settler'),
 };
 
 export const TerrainDarker = mapObject(TerrainImage, darken);

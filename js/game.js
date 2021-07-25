@@ -1,4 +1,6 @@
+import text from '../data/text.js';
 import board from '../js/gameboard.js';
+import {mod} from '../js/util.js';
 
 export default {init, cleanUp};
 
@@ -44,6 +46,9 @@ function init({turn, player}) {
     }
   });
 
+  board.centerOn(0, 0, /* scale= */ 125);
+  setTimeout(() => alert(text.TURN_ONE_INTRO));
+
   state = {turn, player, focus: board, playerObjects};
   handleTurn({player: 0});
 }
@@ -68,71 +73,81 @@ function updateVisibility(player) {
 function handleTurn({player}) {
   updateVisibility(player);
 
-  // Iterate through units.
-  for (const unitLocation of state.playerObjects[player].units) {
-    const {x, y} = unitLocation;
-    board.centerOn(x, y, /* scale= */ 125);
+  let playerUnits = state.playerObjects[player].units;
 
-    addTemporaryListener(document, 'keydown', event => {
-      const {unit, x, y} = unitLocation;
-      switch (event.code) {
-        case 'Numpad1':
-          board.getTile(x, y).units =
-              board.getTile(x, y).units.filter(other => other !== unit);
-          if (y % 2 === 0) {
-            unitLocation.x--;
-          }
-          unitLocation.y++;
-          board.getTile(unitLocation.x, unitLocation.y).units.push(unit);
-          updateVisibility(player);
-          return board.render();
-        case 'Numpad3':
-          board.getTile(x, y).units =
-              board.getTile(x, y).units.filter(other => other !== unit);
-          if (y % 2 === 1) {
-            unitLocation.x++;
-          }
-          unitLocation.y++;
-          board.getTile(unitLocation.x, unitLocation.y).units.push(unit);
-          updateVisibility(player);
-          return board.render();
-        case 'Numpad4':
-          board.getTile(x, y).units =
-              board.getTile(x, y).units.filter(other => other !== unit);
-          unitLocation.x--;
-          board.getTile(unitLocation.x, y).units.push(unit);
-          updateVisibility(player);
-          return board.render();
-        case 'Numpad6':
-          board.getTile(x, y).units =
-              board.getTile(x, y).units.filter(other => other !== unit);
-          unitLocation.x++;
-          board.getTile(unitLocation.x, y).units.push(unit);
-          updateVisibility(player);
-          return board.render();
-        case 'Numpad7':
-          board.getTile(x, y).units =
-              board.getTile(x, y).units.filter(other => other !== unit);
-          if (y % 2 === 0) {
-            unitLocation.x--;
-          }
-          unitLocation.y--;
-          board.getTile(unitLocation.x, unitLocation.y).units.push(unit);
-          updateVisibility(player);
-          return board.render();
-        case 'Numpad9':
-          board.getTile(x, y).units =
-              board.getTile(x, y).units.filter(other => other !== unit);
-          if (y % 2 === 1) {
-            unitLocation.x++;
-          }
-          unitLocation.y--;
-          board.getTile(unitLocation.x, unitLocation.y).units.push(unit);
-          updateVisibility(player);
-          return board.render();
-        default:
-          return board.handleKeydown(event);
-      }
-    });
-  }
+  let unitIndex = 0;
+  let activeUnitLocation = playerUnits[unitIndex];
+  board.centerOn(activeUnitLocation.x, activeUnitLocation.y);
+  board.render();
+
+  addTemporaryListener(document, 'keydown', event => {
+    const {unit, x, y} = activeUnitLocation;
+    switch (event.code) {
+      case 'Enter':
+        unitIndex = mod(unitIndex + 1, playerUnits.length);
+        activeUnitLocation = playerUnits[unitIndex];
+        board.centerOn(activeUnitLocation.x, activeUnitLocation.y);
+        return board.render();
+      case 'Numpad1':
+        board.getTile(x, y).units =
+            board.getTile(x, y).units.filter(other => other !== unit);
+        if (y % 2 === 0) {
+          activeUnitLocation.x--;
+        }
+        activeUnitLocation.y++;
+        board.getTile(activeUnitLocation.x, activeUnitLocation.y)
+            .units.push(unit);
+        updateVisibility(player);
+        return board.render();
+      case 'Numpad3':
+        board.getTile(x, y).units =
+            board.getTile(x, y).units.filter(other => other !== unit);
+        if (y % 2 === 1) {
+          activeUnitLocation.x++;
+        }
+        activeUnitLocation.y++;
+        board.getTile(activeUnitLocation.x, activeUnitLocation.y)
+            .units.push(unit);
+        updateVisibility(player);
+        return board.render();
+      case 'Numpad4':
+        board.getTile(x, y).units =
+            board.getTile(x, y).units.filter(other => other !== unit);
+        activeUnitLocation.x--;
+        board.getTile(activeUnitLocation.x, y).units.push(unit);
+        updateVisibility(player);
+        return board.render();
+      case 'Numpad6':
+        board.getTile(x, y).units =
+            board.getTile(x, y).units.filter(other => other !== unit);
+        activeUnitLocation.x++;
+        board.getTile(activeUnitLocation.x, y).units.push(unit);
+        updateVisibility(player);
+        return board.render();
+      case 'Numpad7':
+        board.getTile(x, y).units =
+            board.getTile(x, y).units.filter(other => other !== unit);
+        if (y % 2 === 0) {
+          activeUnitLocation.x--;
+        }
+        activeUnitLocation.y--;
+        board.getTile(activeUnitLocation.x, activeUnitLocation.y)
+            .units.push(unit);
+        updateVisibility(player);
+        return board.render();
+      case 'Numpad9':
+        board.getTile(x, y).units =
+            board.getTile(x, y).units.filter(other => other !== unit);
+        if (y % 2 === 1) {
+          activeUnitLocation.x++;
+        }
+        activeUnitLocation.y--;
+        board.getTile(activeUnitLocation.x, activeUnitLocation.y)
+            .units.push(unit);
+        updateVisibility(player);
+        return board.render();
+      default:
+        return board.handleKeydown(event);
+    }
+  });
 }
