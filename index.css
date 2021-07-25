@@ -46,6 +46,22 @@
   left: 50vw;
   top: 50vh;
   transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#progress-bar {
+  margin-top: 8px;
+  padding: 1px;
+  border: 2px solid #fff;
+  height: 32px;
+  width: 320px;
+}
+
+#progress-bar > div {
+  background-color: #fff;
+  height: 100%;
 }
 
 #ingame-menu {
