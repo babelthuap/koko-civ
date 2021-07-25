@@ -11,11 +11,11 @@ const MAP_EDITOR_HTML = `<link rel="stylesheet" type="text/css" href="css/mapEdi
   </div>
   <div class="content">
     <div>
-      <button id="return-to-main-menu">Return to main menu</button>
-    </div>
-    <div>
-      <button id="save">Save</button>
-      <button id="load">Load</button>
+      <button id="return-to-main-menu">Main menu</button>
+      <span style="float: right;">
+        <button id="save">Save</button>
+        <button id="load">Load</button>
+      </span>
     </div>
     <hr>
     <div>
