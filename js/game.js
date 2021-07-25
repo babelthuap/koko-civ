@@ -34,15 +34,8 @@ function init({turn, player}) {
     for (const unit of tile.units) {
       const objects =
           playerObjects[unit.owner] || (playerObjects[unit.owner] = {});
-      const playerUnits = objects.units || (objects.units = []);
-      playerUnits.push({unit, x, y});
-    }
-  });
-
-  board.addClickListener((event, tile, x, y) => {
-    // DEBUG
-    if (tile.units.length) {
-      alert(`I'm a ${tile.units[0].type}!`);
+      const playerUnitLocations = objects.units || (objects.units = []);
+      playerUnitLocations.push({unit, x, y});
     }
   });
 
@@ -73,81 +66,111 @@ function updateVisibility(player) {
 function handleTurn({player}) {
   updateVisibility(player);
 
-  let playerUnits = state.playerObjects[player].units;
+  let playerUnitLocations = state.playerObjects[player].units;
 
-  let unitIndex = 0;
-  let activeUnitLocation = playerUnits[unitIndex];
+  let unitIndex, activeUnitLocation;
+  setActiveUnitIndex(0);
   board.centerOn(activeUnitLocation.x, activeUnitLocation.y);
   board.render();
+
+  function setActiveUnitIndex(index) {
+    unitIndex = index;
+    activeUnitLocation = playerUnitLocations[unitIndex];
+    board.setActiveUnitPosition(activeUnitLocation.x, activeUnitLocation.y);
+  }
+
+  board.addClickListener((event, tile, x, y) => {
+    for (const unit of tile.units) {
+      const index = playerUnitLocations.findIndex(
+          unitLocation => unitLocation.unit === unit);
+      if (index !== -1) {
+        setActiveUnitIndex(index);
+        return board.render();
+      }
+    }
+  });
 
   addTemporaryListener(document, 'keydown', event => {
     const {unit, x, y} = activeUnitLocation;
     switch (event.code) {
       case 'Enter':
-        unitIndex = mod(unitIndex + 1, playerUnits.length);
-        activeUnitLocation = playerUnits[unitIndex];
+        setActiveUnitIndex(mod(unitIndex + 1, playerUnitLocations.length));
+        board.centerOn(activeUnitLocation.x, activeUnitLocation.y);
+        return board.render();
+      case 'c':
         board.centerOn(activeUnitLocation.x, activeUnitLocation.y);
         return board.render();
       case 'Numpad1':
-        board.getTile(x, y).units =
-            board.getTile(x, y).units.filter(other => other !== unit);
-        if (y % 2 === 0) {
-          activeUnitLocation.x--;
-        }
-        activeUnitLocation.y++;
-        board.getTile(activeUnitLocation.x, activeUnitLocation.y)
-            .units.push(unit);
-        updateVisibility(player);
-        return board.render();
+        return moveActiveUnit('SW');
       case 'Numpad3':
-        board.getTile(x, y).units =
-            board.getTile(x, y).units.filter(other => other !== unit);
-        if (y % 2 === 1) {
-          activeUnitLocation.x++;
-        }
-        activeUnitLocation.y++;
-        board.getTile(activeUnitLocation.x, activeUnitLocation.y)
-            .units.push(unit);
-        updateVisibility(player);
-        return board.render();
+        return moveActiveUnit('SE');
       case 'Numpad4':
-        board.getTile(x, y).units =
-            board.getTile(x, y).units.filter(other => other !== unit);
-        activeUnitLocation.x--;
-        board.getTile(activeUnitLocation.x, y).units.push(unit);
-        updateVisibility(player);
-        return board.render();
+        return moveActiveUnit('W');
       case 'Numpad6':
-        board.getTile(x, y).units =
-            board.getTile(x, y).units.filter(other => other !== unit);
-        activeUnitLocation.x++;
-        board.getTile(activeUnitLocation.x, y).units.push(unit);
-        updateVisibility(player);
-        return board.render();
+        return moveActiveUnit('E');
       case 'Numpad7':
-        board.getTile(x, y).units =
-            board.getTile(x, y).units.filter(other => other !== unit);
-        if (y % 2 === 0) {
-          activeUnitLocation.x--;
-        }
-        activeUnitLocation.y--;
-        board.getTile(activeUnitLocation.x, activeUnitLocation.y)
-            .units.push(unit);
-        updateVisibility(player);
-        return board.render();
+        return moveActiveUnit('NW');
       case 'Numpad9':
-        board.getTile(x, y).units =
-            board.getTile(x, y).units.filter(other => other !== unit);
-        if (y % 2 === 1) {
-          activeUnitLocation.x++;
-        }
-        activeUnitLocation.y--;
-        board.getTile(activeUnitLocation.x, activeUnitLocation.y)
-            .units.push(unit);
-        updateVisibility(player);
-        return board.render();
+        return moveActiveUnit('NE');
       default:
         return board.handleKeydown(event);
     }
   });
+
+  function moveActiveUnit(direction) {
+    const {unit, x, y} = activeUnitLocation;
+    let toX, toY;
+    switch (direction) {
+      case 'NE':
+        if (y === 0) return;
+        toX = (y % 2 === 1) ? mod(x + 1, board.width) : x;
+        toY = y - 1;
+        break;
+      case 'NW':
+        if (y === 0) return;
+        toX = (y % 2 === 0) ? mod(x - 1, board.width) : x;
+        toY = y - 1;
+        break;
+      case 'E':
+        toX = mod(x + 1, board.width);
+        toY = y;
+        break;
+      case 'W':
+        toX = mod(x - 1, board.width);
+        toY = y;
+        break;
+      case 'SE':
+        if (y === board.height - 1) return;
+        toX = (y % 2 === 1) ? mod(x + 1, board.width) : x;
+        toY = y + 1;
+        break;
+      case 'SW':
+        if (y === board.height - 1) return;
+        toX = (y % 2 === 0) ? mod(x - 1, board.width) : x;
+        toY = y + 1;
+        break;
+    }
+
+    const toTile = board.getTile(toX, toY);
+    const toTerrain = toTile.terrain;
+    switch (unit.type) {
+      case 'SETTLER':
+        if (['OCEAN', 'SEA', 'COAST', 'FRESHWATER_LAKE'].includes(toTerrain)) {
+          return;
+        }
+        break;
+      case 'SCOUT':
+        // No restrictions, woohoo!
+        break;
+    }
+
+    board.getTile(x, y).units =
+        board.getTile(x, y).units.filter(other => other !== unit);
+    toTile.units.push(unit);
+    activeUnitLocation.x = toX;
+    activeUnitLocation.y = toY;
+    board.setActiveUnitPosition(activeUnitLocation.x, activeUnitLocation.y);
+    updateVisibility(player);
+    board.render();
+  }
 }

@@ -111,6 +111,15 @@ export function renderGrid(x, y, view, ctx) {
       /* fill= */ false);
 }
 
+export function renderUnitHighlight(x, y, view, ctx) {
+    ctx.strokeStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(
+        (x + 0.5 * HEX_WIDTH - view.leftX) * view.scale,
+        (y + 0.5 - view.topY) * view.scale, view.scale / 2, 0, Math.PI * 2);
+    ctx.stroke();
+}
+
 export function renderUnitStack(units, x, y, view, ctx) {
   // Arbitrarily pick the last unit in the array.
   const topUnit = units[units.length - 1];

@@ -1,6 +1,6 @@
 import {compress, decompress} from './compression.js';
 import {registerDragCallbacks} from './globalDragHandler.js';
-import {clear, coordsToPosition, HEX_WIDTH, positionToCoords, renderGrid, renderTerrain, renderUnitStack} from './renderUtils.js';
+import {clear, coordsToPosition, HEX_WIDTH, positionToCoords, renderGrid, renderTerrain, renderUnitHighlight, renderUnitStack} from './renderUtils.js';
 import {clamp, limitOncePerFrame, mod} from './util.js';
 
 // TODO: Globe view!
@@ -51,6 +51,7 @@ function Gameboard() {
     scale: 100,  // pixels per unit (of internal coordinates)
     showGrid: false,
     revealAll: false,
+    activeUnitPosition: undefined,
   };
 
 
@@ -104,6 +105,15 @@ function Gameboard() {
       topY: y + 0.5 * (1 - window.innerHeight / scale),
       scale: scale,
     });
+  }
+
+  /** Sets the position of the active unit */
+  function setActiveUnitPosition(tx = undefined, ty = undefined) {
+    if (tx === undefined) {
+      view.activeUnitPosition = undefined;
+    } else {
+      view.activeUnitPosition = [tx, ty];
+    }
   }
 
   /** Toggles the grid overlay. */
@@ -313,6 +323,13 @@ function Gameboard() {
       }
     }
 
+    // Render active unit highlight.
+    if (view.activeUnitPosition !== undefined) {
+      const [tx, ty] = view.activeUnitPosition;
+      const [x, y] = positionToCoords(tx, ty);
+      renderUnitHighlight(x, y, view, ctx);
+    }
+
     // Render units.
     for (const {units, x, y} of unitLocations) {
       renderUnitStack(units, x, y, view, ctx);
@@ -429,6 +446,7 @@ function Gameboard() {
     init,
     move,
     centerOn,
+    setActiveUnitPosition,
     toggleGrid,
     revealAll,
     save,
