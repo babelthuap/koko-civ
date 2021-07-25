@@ -105,9 +105,9 @@ export function renderTerrain(tile, x, y, view, ctx) {
 
 export function renderGrid(x, y, view, ctx) {
   drawHex(
-        ctx, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
-        HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, '#aaa',
-        /* fill= */ false);
+      ctx, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
+      HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, '#aaa',
+      /* fill= */ false);
 }
 
 export function renderUnit(unit, x, y, view, ctx) {
@@ -124,7 +124,6 @@ export function renderUnit(unit, x, y, view, ctx) {
  * bounding box, its width, its height, and its color.
  */
 function drawHex(ctx, x, y, width, height, color, fill) {
-  ctx.strokeStyle = color;
   ctx.beginPath();
   const midX = x + width * 0.5;
   const maxX = x + width;
@@ -138,8 +137,10 @@ function drawHex(ctx, x, y, width, height, color, fill) {
   ctx.lineTo(x, y_4);
   ctx.lineTo(midX, y);
   if (fill) {
+    ctx.fillStyle = color;
     ctx.fill();
   } else {
+    ctx.strokeStyle = color;
     ctx.stroke();
   }
 }
