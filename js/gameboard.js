@@ -25,6 +25,7 @@ function Gameboard() {
   canvas.height = window.innerHeight;
   GAMEBOARD_EL.innerHTML = '';
   GAMEBOARD_EL.append(canvas);
+  const ctx = canvas.getContext('2d', {alpha: false});
 
 
   /**********/
@@ -219,9 +220,12 @@ function Gameboard() {
   /* PRIVATE METHODS */
   /*******************/
 
+  // let renderCount = 0;
   function rawRender() {
+    // const start = performance.now();
+
     // Raw, non-rate-limited render. Always use inside limitOncePerFrame.
-    clear(canvas);
+    clear(canvas, ctx);
     const topLeftIndex = coordsToPosition(view.leftX, view.topY, width);
     const bottomRightIndex = coordsToPosition(
         view.leftX + canvas.width / view.scale,
@@ -236,9 +240,16 @@ function Gameboard() {
         }
         const tile = tiles[width * ty + mod(tx, width)];
         const [x, y] = positionToCoords(tx, ty);
-        renderTile(tile, x, y, view, canvas);
+        renderTile(tile, x, y, view, ctx);
       }
     }
+
+    // Uncomment to enable render timing.
+    // const renderTime = performance.now() - start;
+    // console.log(
+    //     (renderCount % 10) + '*'.repeat(Math.round(renderTime)) +
+    //     ` ${renderTime.toFixed(1)}ms`);
+    // renderCount++;
   }
 
   let listenersAttached = false;

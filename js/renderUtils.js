@@ -63,8 +63,7 @@ export function coordsToPosition(x, y, width) {
 }
 
 /** Erases the canvas. */
-export function clear(canvas) {
-  const ctx = canvas.getContext('2d');
+export function clear(canvas, ctx) {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
@@ -83,24 +82,22 @@ export function positionToCoords(tx, ty) {
  * Renders the specified view of a single tile onto a canvas given the
  * upper-left corner of its bounding box in internal coordinates.
  */
-export function renderTile(tile, x, y, view, canvas) {
+export function renderTile(tile, x, y, view, ctx) {
   // Terrain
   if (tile.terrain in Image) {
-    const ctx = canvas.getContext('2d');
     const img = Image[tile.terrain];
     const imgWidth = img.width;
     const imgHeight = img.height;
     ctx.drawImage(
-        img,
-        (x - HEX_WIDTH * 50/imgWidth - view.leftX) * view.scale,
-        (y - 50/imgHeight - view.topY) * view.scale,
-        HEX_WIDTH * view.scale * (imgWidth + 100)/imgWidth,
-        /* hex height == 1 */ view.scale * (imgHeight + 100)/imgHeight);
+        img, (x - HEX_WIDTH * 50 / imgWidth - view.leftX) * view.scale,
+        (y - 50 / imgHeight - view.topY) * view.scale,
+        HEX_WIDTH * view.scale * (imgWidth + 100) / imgWidth,
+        /* hex height == 1 */ view.scale * (imgHeight + 100) / imgHeight);
   } else {
     const color =
         (tile.terrain in Terrain) ? Terrain[tile.terrain].color : '#f0f';
     drawHex(
-        canvas, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
+        ctx, (x - view.leftX) * view.scale, (y - view.topY) * view.scale,
         HEX_WIDTH * view.scale, /* hex height == 1 */ view.scale, color);
   }
 }
@@ -109,8 +106,7 @@ export function renderTile(tile, x, y, view, canvas) {
  * Draws a vertical hex on the canvas given: the upper-left corner of its
  * bounding box, its width, its height, and its color.
  */
-function drawHex(canvas, x, y, width, height, color) {
-  const ctx = canvas.getContext('2d');
+function drawHex(ctx, x, y, width, height, color) {
   ctx.fillStyle = color;
   ctx.beginPath();
   const midX = x + width * 0.5;
