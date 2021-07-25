@@ -2,6 +2,10 @@ import board from '../js/gameboard.js';
 import {hide} from '../js/util.js';
 import {forEachTile} from '../map-scripts/common.js';
 
+import {constructViewElFromHtml} from './viewUtil.js';
+
+export default {init};
+
 const MAIN_MENU_HTML = `<div id="main-menu" class="ui">
   <div class="title">
     <h1>Welcome to Koko Civ</h1>
@@ -29,15 +33,12 @@ const MAIN_MENU_HTML = `<div id="main-menu" class="ui">
 let mainMenuEl;
 let haveFocus;
 
-export function initMainMenu(renderView) {
+function init(renderView) {
   haveFocus = true;
 
   // One-time initialization.
   if (!mainMenuEl) {
-    mainMenuEl = document.createElement('div');
-    hide(mainMenuEl);
-    mainMenuEl.innerHTML = MAIN_MENU_HTML;
-    document.body.append(mainMenuEl);
+    mainMenuEl = constructViewElFromHtml(MAIN_MENU_HTML);
 
     // Handle navigation.
     const quickStart = mainMenuEl.querySelector('#quick-start');

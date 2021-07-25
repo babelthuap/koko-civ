@@ -1,5 +1,8 @@
 import mapEditor from '../js/mapEditor.js';
-import {hide} from '../js/util.js';
+
+import {constructViewElFromHtml} from './viewUtil.js';
+
+export default {init};
 
 const CONTROLS_HTML = `<div class="ui" id="controls">
   <div id="dragbar"></div>
@@ -59,7 +62,7 @@ const CONTROLS_HTML = `<div class="ui" id="controls">
 
 let controlsEl;
 
-export function initMapEditor(renderView) {
+function init(renderView) {
   // One-time initialization.
   if (!controlsEl) {
     const mapEditorCss = document.createElement('link');
@@ -67,10 +70,7 @@ export function initMapEditor(renderView) {
     mapEditorCss.type = 'text/css';
     mapEditorCss.href = 'css/mapEditor.css';
     document.head.append(mapEditorCss);
-    controlsEl = document.createElement('div');
-    hide(controlsEl);
-    controlsEl.innerHTML = CONTROLS_HTML;
-    document.body.append(controlsEl);
+    controlsEl = constructViewElFromHtml(CONTROLS_HTML);
 
     // Handle navigation
     controlsEl.querySelector('#return-to-main-menu')
