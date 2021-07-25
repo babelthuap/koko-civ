@@ -131,6 +131,13 @@ function Gameboard() {
     tiles = decompressedTiles;
     coordWidth = positionToCoords(width, 0)[0];
     coordHeight = positionToCoords(0, height - 1)[1] + 1;
+
+    tiles.forEach(tile => {
+      if (!tile.canSee) tile.canSee = [];
+      if (!tile.hasSeen) tile.hasSeen = [];
+      if (!tile.units) tile.units = [];
+    });
+
     updateView({leftX: 0, topY: 0, scale: 0});
     attachListeners();
   }
