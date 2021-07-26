@@ -15,6 +15,10 @@ let startDragY = 0;
 // Map from watched elements to their currently-registered callbacks.
 const elementCallbacks = new Map();
 
+const nullFn = () => {};
+
+const preventDefault = (event) => event.preventDefault();
+
 /**
  * Registers drag-related callbacks on an element. The following callbacks may
  * be provided:
@@ -28,16 +32,19 @@ const elementCallbacks = new Map();
  *   - finalize(event): Invoked when a drag ends.
  */
 export function registerDragCallbacks(element, {
-  onDragStart = () => {},
-  onDrag = () => {},
-  onLeftClick = () => {},
-  onRightClick = () => {},
-  finalize = () => {},
+  onDragStart = nullFn,
+  onDrag = nullFn,
+  onLeftClick = nullFn,
+  onRightClick = nullFn,
+  finalize = nullFn,
 }) {
   if (elementCallbacks.has(element)) {
     unregisterDragCallbacks(element);
   }
   element.addEventListener('mousedown', handleMousedown);
+  if (onRightClick !== nullFn) {
+    element.addEventListener('contextmenu', preventDefault);
+  }
   elementCallbacks.set(
       element, {onLeftClick, onRightClick, onDragStart, onDrag, finalize});
 }
@@ -45,7 +52,9 @@ export function registerDragCallbacks(element, {
 /** Un-registers all drag-related callbacks on an element. */
 export function unregisterDragCallbacks(element) {
   element.removeEventListener('mousedown', handleMousedown);
+  element.removeEventListener('contextmenu', preventDefault);
   elementCallbacks.delete(element);
+  activeCallbacks = null;
 }
 
 document.addEventListener('mousemove', (event) => {
