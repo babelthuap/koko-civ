@@ -15,459 +15,290 @@
 const techs = {
   // ANCIENT ERA
   'The Wheel': {
-    cost: 60,
-    era: 'Ancient',
-    requires: null,
+    cost: 60, era: 'Ancient', requires: null,
   },
   'Agriculture': {
-    cost: 60,
-    era: 'Ancient',
-    requires: null,
+    cost: 60, era: 'Ancient', requires: null,
   },
   'Animal Husbandry': {
-    cost: 100,
-    era: 'Ancient',
-    requires: {OR: ['Agriculture', 'Hunting']},
+    cost: 100, era: 'Ancient', requires: {OR: ['Agriculture', 'Hunting']},
   },
   'Fishing': {
-    cost: 40,
-    era: 'Ancient',
-    requires: null,
+    cost: 40, era: 'Ancient', requires: null,
   },
   'Hunting': {
-    cost: 40,
-    era: 'Ancient',
-    requires: null,
+    cost: 40, era: 'Ancient', requires: null,
   },
   'Mysticism': {
-    cost: 50,
-    era: 'Ancient',
-    requires: null,
+    cost: 50, era: 'Ancient', requires: null,
   },
   'Archery': {
-    cost: 60,
-    era: 'Ancient',
-    requires: 'Hunting',
+    cost: 60, era: 'Ancient', requires: 'Hunting',
   },
   'Pottery': {
-    cost: 80,
-    era: 'Ancient',
-    requires: {AND: ['The Wheel', {OR: ['Agriculture', 'Fishing']}]},
+    cost: 80, era: 'Ancient', requires: {AND: ['The Wheel', {OR: ['Agriculture', 'Fishing']}]},
   },
   'Writing': {
-    cost: 120,
-    era: 'Ancient',
-    requires: {OR: ['Priesthood', 'Animal Husbandry', 'Pottery']},
+    cost: 120, era: 'Ancient', requires: {OR: ['Priesthood', 'Animal Husbandry', 'Pottery']},
   },
   'Sailing': {
-    cost: 100,
-    era: 'Ancient',
-    requires: 'Fishing',
+    cost: 100, era: 'Ancient', requires: 'Fishing',
   },
   'Masonry': {
-    cost: 80,
-    era: 'Ancient',
-    requires: {OR: ['Mining', 'Mysticism']},
+    cost: 80, era: 'Ancient', requires: {OR: ['Mining', 'Mysticism']},
   },
   'Mining': {
-    cost: 50,
-    era: 'Ancient',
-    requires: null,
+    cost: 50, era: 'Ancient', requires: null,
   },
   'Priesthood': {
-    cost: 60,
-    era: 'Ancient',
-    requires: {OR: ['Meditation', 'Polytheism']},
+    cost: 60, era: 'Ancient', requires: {OR: ['Meditation', 'Polytheism']},
   },
   'Bronze Working': {
-    cost: 120,
-    era: 'Ancient',
-    requires: 'Mining',
+    cost: 120, era: 'Ancient', requires: 'Mining',
   },
   'Polytheism': {
-    cost: 100,
-    era: 'Ancient',
-    requires: 'Mysticism',
+    cost: 100, era: 'Ancient', requires: 'Mysticism',
   },
   'Monotheism': {
-    cost: 120,
-    era: 'Ancient',
-    requires: {AND: ['Masonry', 'Polytheism']},
+    cost: 120, era: 'Ancient', requires: {AND: ['Masonry', 'Polytheism']},
   },
   'Meditation': {
-    cost: 80,
-    era: 'Ancient',
-    requires: 'Mysticism',
+    cost: 80, era: 'Ancient', requires: 'Mysticism',
   },
 
   // CLASSICAL ERA
   'Monarchy': {
-    cost: 300,
-    era: 'Classical',
-    requires: {OR: ['Priesthood', 'Monotheism']},
+    cost: 300, era: 'Classical', requires: {OR: ['Priesthood', 'Monotheism']},
   },
   'Alphabet': {
-    cost: 300,
-    era: 'Classical',
-    requires: 'Writing',
+    cost: 300, era: 'Classical', requires: 'Writing',
   },
   'Mathematics': {
-    cost: 250,
-    era: 'Classical',
-    requires: 'Writing',
+    cost: 250, era: 'Classical', requires: 'Writing',
   },
   'Construction': {
-    cost: 350,
-    era: 'Classical',
-    requires: {AND: ['Masonry', 'Mathematics']},
+    cost: 350, era: 'Classical', requires: {AND: ['Masonry', 'Mathematics']},
   },
   'Code of Laws': {
-    cost: 350,
-    era: 'Classical',
-    requires: {AND: ['Writing', {OR: ['Priesthood', 'Currency']}]},
+    cost: 350, era: 'Classical', requires: {AND: ['Writing', {OR: ['Priesthood', 'Currency']}]},
   },
   'Metal Casting': {
-    cost: 450,
-    era: 'Classical',
-    requires: {AND: ['Pottery', 'Bronze Working']},
+    cost: 450, era: 'Classical', requires: {AND: ['Pottery', 'Bronze Working']},
   },
   'Compass': {
-    cost: 400,
-    era: 'Classical',
-    requires: {AND: ['Sailing', 'Iron Working']},
+    cost: 400, era: 'Classical', requires: {AND: ['Sailing', 'Iron Working']},
   },
   'Currency': {
-    cost: 400,
-    era: 'Classical',
-    requires: {AND: ['Mathematics', 'Alphabet']},
+    cost: 400, era: 'Classical', requires: {AND: ['Mathematics', 'Alphabet']},
   },
   'Horseback Riding': {
-    cost: 250,
-    era: 'Classical',
-    requires: 'Animal Husbandry',
+    cost: 250, era: 'Classical', requires: 'Animal Husbandry',
   },
   'Drama': {
-    cost: 300,
-    era: 'Classical',
-    requires: 'Aesthetics',
+    cost: 300, era: 'Classical', requires: 'Aesthetics',
   },
   'Calendar': {
-    cost: 350,
-    era: 'Classical',
-    requires: {AND: ['Sailing', 'Mathematics']},
+    cost: 350, era: 'Classical', requires: {AND: ['Sailing', 'Mathematics']},
   },
   'Iron Working': {
-    cost: 200,
-    era: 'Classical',
-    requires: 'Bronze Working',
+    cost: 200, era: 'Classical', requires: 'Bronze Working',
   },
   'Literature': {
-    cost: 200,
-    era: 'Classical',
-    requires: {AND: ['Polytheism', 'Aesthetics']},
+    cost: 200, era: 'Classical', requires: {AND: ['Polytheism', 'Aesthetics']},
   },
   'Aesthetics': {
-    cost: 300,
-    era: 'Classical',
-    requires: 'Writing',
+    cost: 300, era: 'Classical', requires: 'Writing',
   },
 
   // MEDIEVAL ERA
   'Banking': {
-    cost: 700,
-    era: 'Medieval',
-    requires: {AND: ['Currency', 'Guilds']},
+    cost: 700, era: 'Medieval', requires: {AND: ['Currency', 'Guilds']},
   },
   'Engineering': {
-    cost: 1000,
-    era: 'Medieval',
-    requires: {AND: ['Machinery', 'Construction']},
+    cost: 1000, era: 'Medieval', requires: {AND: ['Machinery', 'Construction']},
   },
   'Guilds': {
-    cost: 1000,
-    era: 'Medieval',
-    requires: {AND: ['Feudalism', 'Machinery']},
+    cost: 1000, era: 'Medieval', requires: {AND: ['Feudalism', 'Machinery']},
   },
   'Feudalism': {
-    cost: 700,
-    era: 'Medieval',
-    requires: {AND: ['Writing', 'Monarchy']},
+    cost: 700, era: 'Medieval', requires: {AND: ['Writing', 'Monarchy']},
   },
   'Machinery': {
-    cost: 700,
-    era: 'Medieval',
-    requires: 'Metal Casting',
+    cost: 700, era: 'Medieval', requires: 'Metal Casting',
   },
   'Civil Service': {
-    cost: 800,
-    era: 'Medieval',
-    requires: {AND: ['Mathematics', {OR: ['Code of Laws', 'Feudalism']}]},
+    cost: 800, era: 'Medieval', requires: {AND: ['Mathematics', {OR: ['Code of Laws', 'Feudalism']}]},
   },
   'Philosophy': {
-    cost: 800,
-    era: 'Medieval',
-    requires: {AND: ['Meditation', {OR: ['Drama', 'Code of Laws']}]},
+    cost: 800, era: 'Medieval', requires: {AND: ['Meditation', {OR: ['Drama', 'Code of Laws']}]},
   },
   'Optics': {
-    cost: 600,
-    era: 'Medieval',
-    requires: {AND: ['Compass', 'Machinery']},
+    cost: 600, era: 'Medieval', requires: {AND: ['Compass', 'Machinery']},
+  },
+  'Theology': {
+    cost: 500, era: 'Medieval', requires: {AND: ['Writing', 'Monotheism']},
   },
   'Paper': {
-    cost: 600,
-    era: 'Medieval',
-    requires: {AND: ['Theology', 'Civil Service']},
+    cost: 600, era: 'Medieval', requires: {AND: ['Theology', 'Civil Service']},
   },
   'Music': {
-    cost: 600,
-    era: 'Medieval',
-    requires: {AND: ['Mathematics', {OR: ['Literature', 'Drama']}]},
+    cost: 600, era: 'Medieval', requires: {AND: ['Mathematics', {OR: ['Literature', 'Drama']}]},
   },
   'Divine Right': {
-    cost: 1200,
-    era: 'Medieval',
-    requires: {AND: ['Theology', 'Monarchy']},
+    cost: 1200, era: 'Medieval', requires: {AND: ['Theology', 'Monarchy']},
   },
 
   // RENAISSANCE ERA
   'Economics': {
-    cost: 1400,
-    era: 'Renaissance',
-    requires: {AND: ['Banking', 'Education']},
+    cost: 1400, era: 'Renaissance', requires: {AND: ['Banking', 'Education']},
   },
   'Constitution': {
-    cost: 2000,
-    era: 'Renaissance',
-    requires: {AND: ['Code of Laws', 'Nationalism']},
+    cost: 2000, era: 'Renaissance', requires: {AND: ['Code of Laws', 'Nationalism']},
   },
   'Astronomy': {
-    cost: 2000,
-    era: 'Renaissance',
-    requires: {AND: ['Calendar', 'Optics']},
+    cost: 2000, era: 'Renaissance', requires: {AND: ['Calendar', 'Optics']},
   },
   'Democracy': {
-    cost: 2800,
-    era: 'Renaissance',
-    requires: {AND: ['Constitution', 'Printing Press']}
+    cost: 2800, era: 'Renaissance', requires: {AND: ['Constitution', 'Printing Press']}
   },
   'Education': {
-    cost: 1800,
-    era: 'Renaissance',
-    requires: 'Paper',
+    cost: 1800, era: 'Renaissance', requires: 'Paper',
   },
   'Chemistry': {
-    cost: 1800,
-    era: 'Renaissance',
-    requires: {AND: ['Engineering', 'Gunpowder']}
+    cost: 1800, era: 'Renaissance', requires: {AND: ['Engineering', 'Gunpowder']}
   },
   'Corporation': {
-    cost: 1600,
-    era: 'Renaissance',
-    requires: {AND: ['Constitution', 'Economics']}
+    cost: 1600, era: 'Renaissance', requires: {AND: ['Constitution', 'Economics']}
   },
   'Replaceable Parts': {
-    cost: 1800,
-    era: 'Renaissance',
-    requires: {AND: ['Banking', 'Printing Press']}
+    cost: 1800, era: 'Renaissance', requires: {AND: ['Banking', 'Printing Press']}
   },
   'Gunpowder': {
-    cost: 1200,
-    era: 'Renaissance',
-    requires: {OR: ['Guilds', 'Education']},
+    cost: 1200, era: 'Renaissance', requires: {OR: ['Guilds', 'Education']},
   },
   'Rifling': {
-    cost: 2400,
-    era: 'Renaissance',
-    requires: {AND: ['Gunpowder', 'Replaceable Parts']}
+    cost: 2400, era: 'Renaissance', requires: {AND: ['Gunpowder', 'Replaceable Parts']}
   },
   'Printing Press': {
-    cost: 1600,
-    era: 'Renaissance',
-    requires: {AND: ['Machinery', 'Alphabet', 'Paper']}
+    cost: 1600, era: 'Renaissance', requires: {AND: ['Machinery', 'Alphabet', 'Paper']}
   },
   'Nationalism': {
-    cost: 1800,
-    era: 'Renaissance',
-    requires: {AND: ['Civil Service', {OR: ['Philosophy', 'Divine Right']}]},
+    cost: 1800, era: 'Renaissance', requires: {AND: ['Civil Service', {OR: ['Philosophy', 'Divine Right']}]},
   },
   'Military Science': {
-    cost: 2000,
-    era: 'Renaissance',
-    requires: 'Chemistry',
+    cost: 2000, era: 'Renaissance', requires: 'Chemistry',
   },
   'Military Tradition': {
-    cost: 2000,
-    era: 'Renaissance',
-    requires: {AND: ['Music', 'Nationalism']}
+    cost: 2000, era: 'Renaissance', requires: {AND: ['Music', 'Nationalism']}
   },
   'Liberalism': {
-    cost: 1400,
-    era: 'Renaissance',
-    requires: {AND: ['Philosophy', 'Education']}
+    cost: 1400, era: 'Renaissance', requires: {AND: ['Philosophy', 'Education']}
   },
 
   // INDUSTRIAL ERA
   'Railroad': {
-    cost: 4500,
-    era: 'Industrial',
-    requires: {AND: ['Steam Power', 'Steel']}
+    cost: 4500, era: 'Industrial', requires: {AND: ['Steam Power', 'Steel']}
   },
   'Electricity': {
-    cost: 4500,
-    era: 'Industrial',
-    requires: 'Physics',
+    cost: 4500, era: 'Industrial', requires: 'Physics',
   },
   'Assembly Line': {
-    cost: 5000,
-    era: 'Industrial',
-    requires: {AND: ['Corporation', 'Steam Power']}
+    cost: 5000, era: 'Industrial', requires: {AND: ['Corporation', 'Steam Power']}
   },
   'Steel': {
-    cost: 2800,
-    era: 'Industrial',
-    requires: {AND: ['Iron Working', 'Chemistry']}
+    cost: 2800, era: 'Industrial', requires: {AND: ['Iron Working', 'Chemistry']}
   },
   'Medicine': {
-    cost: 4500,
-    era: 'Industrial',
-    requires: {AND: ['Optics', 'Biology']},
+    cost: 4500, era: 'Industrial', requires: {AND: ['Optics', 'Biology']},
   },
   'Industrialism': {
-    cost: 6500,
-    era: 'Industrial',
-    requires: {AND: ['Electricity', 'Assembly Line']}
+    cost: 6500, era: 'Industrial', requires: {AND: ['Electricity', 'Assembly Line']}
+  },
+  'Scientific Method': {
+    cost: 1400, era: 'Industrial', requires: {AND: ['Philosophy', 'Education']}
   },
   'Communism': {
-    cost: 2800,
-    era: 'Industrial',
-    requires: {AND: ['Liberalism', 'Scientific Method']}
+    cost: 2800, era: 'Industrial', requires: {AND: ['Liberalism', 'Scientific Method']}
   },
   'Steam Power': {
-    cost: 3200,
-    era: 'Industrial',
-    requires: {AND: ['Chemistry', 'Replaceable Parts']}
+    cost: 3200, era: 'Industrial', requires: {AND: ['Chemistry', 'Replaceable Parts']}
   },
   'Fission': {
-    cost: 5500,
-    era: 'Industrial',
-    requires: 'Electricity',
+    cost: 5500, era: 'Industrial', requires: 'Electricity',
   },
   'Combustion': {
-    cost: 3600,
-    era: 'Industrial',
-    requires: 'Railroad',
+    cost: 3600, era: 'Industrial', requires: 'Railroad',
   },
   'Biology': {
-    cost: 3600,
-    era: 'Industrial',
-    requires: {AND: ['Chemistry', 'Scientific Method']},
+    cost: 3600, era: 'Industrial', requires: {AND: ['Chemistry', 'Scientific Method']},
   },
   'Physics': {
-    cost: 4000,
-    era: 'Industrial',
-    requires: {AND: ['Astronomy', 'Scientific Method']},
+    cost: 4000, era: 'Industrial', requires: {AND: ['Astronomy', 'Scientific Method']},
   },
   'Fascism': {
-    cost: 2400,
-    era: 'Industrial',
-    requires: {AND: ['Assembly Line', 'Nationalism']},
+    cost: 2400, era: 'Industrial', requires: {AND: ['Assembly Line', 'Nationalism']},
   },
   'Artillery': {
-    cost: 4000,
-    era: 'Industrial',
-    requires: {AND: ['Physics', 'Steel', 'Rifling']},
+    cost: 4000, era: 'Industrial', requires: {AND: ['Physics', 'Steel', 'Rifling']},
   },
 
   // MODERN ERA
   'Radio': {
-    cost: 6000,
-    era: 'Modern',
-    requires: 'Electricity',
+    cost: 6000, era: 'Modern', requires: 'Electricity',
   },
   'Flight': {
-    cost: 5000,
-    era: 'Modern',
-    requires: {AND: ['Physics', 'Combustion']},
+    cost: 5000, era: 'Modern', requires: {AND: ['Physics', 'Combustion']},
   },
   'Mass Media': {
-    cost: 3600,
-    era: 'Modern',
-    requires: 'Radio',
+    cost: 3600, era: 'Modern', requires: 'Radio',
   },
   'Plastics': {
-    cost: 7000,
-    era: 'Modern',
-    requires: {AND: ['Combustion', 'Industrialism']}
+    cost: 7000, era: 'Modern', requires: {AND: ['Combustion', 'Industrialism']}
   },
   'Computers': {
-    cost: 6500,
-    era: 'Modern',
-    requires: {AND: ['Radio', 'Plastics']},
+    cost: 6500, era: 'Modern', requires: {AND: ['Radio', 'Plastics']},
   },
   'Ecology': {
-    cost: 5500,
-    era: 'Modern',
-    requires: {AND: ['Biology', {OR: ['Plastics', 'Fission']}]},
+    cost: 5500, era: 'Modern', requires: {AND: ['Biology', {OR: ['Plastics', 'Fission']}]},
   },
   'Refrigeration': {
-    cost: 4000,
-    era: 'Modern',
-    requires: {AND: ['Biology', 'Electricity']},
+    cost: 4000, era: 'Modern', requires: {AND: ['Biology', 'Electricity']},
   },
   'Rocketry': {
-    cost: 5000,
-    era: 'Modern',
-    requires: {AND: ['Rifling', {OR: ['Flight', 'Artillery']}]},
+    cost: 5000, era: 'Modern', requires: {AND: ['Rifling', {OR: ['Flight', 'Artillery']}]},
   },
   'Robotics': {
-    cost: 8000,
-    era: 'Modern',
-    requires: 'Computers',
+    cost: 8000, era: 'Modern', requires: 'Computers',
   },
   'Satellites': {
-    cost: 6000,
-    era: 'Modern',
-    requires: {AND: ['Radio', 'Rocketry']},
+    cost: 6000, era: 'Modern', requires: {AND: ['Radio', 'Rocketry']},
   },
   'Fusion': {
-    cost: 8000,
-    era: 'Modern',
-    requires: {AND: ['Fission', 'Fiber Optics']},
+    cost: 8000, era: 'Modern', requires: {AND: ['Fission', 'Fiber Optics']},
   },
   'Laser': {
-    cost: 7000,
-    era: 'Modern',
-    requires: {AND: ['Plastics', 'Satellites']},
+    cost: 7000, era: 'Modern', requires: {AND: ['Plastics', 'Satellites']},
+  },
+  'Composites': {
+    cost: 8000, era: 'Modern', requires: {AND: ['Plastics', 'Satellites']},
   },
   'Stealth': {
-    cost: 8000,
-    era: 'Modern',
-    requires: {AND: ['Composites', 'Advanced Flight']},
+    cost: 8000, era: 'Modern', requires: {AND: ['Composites', 'Advanced Flight']},
   },
   'Genetics': {
-    cost: 7000,
-    era: 'Modern',
-    requires: {AND: ['Medicine', 'Superconductors']},
+    cost: 7000, era: 'Modern', requires: {AND: ['Medicine', 'Superconductors']},
   },
   'Fiber Optics': {
-    cost: 7500,
-    era: 'Modern',
-    requires: {OR: ['Computers', 'Laser']},
+    cost: 7500, era: 'Modern', requires: {OR: ['Computers', 'Laser']},
   },
   'Advanced Flight': {
-    cost: 5000,
-    era: 'Modern',
-    requires: {AND: ['Satellites', 'Flight']},
+    cost: 5000, era: 'Modern', requires: {AND: ['Satellites', 'Flight']},
   },
   'Superconductors': {
-    cost: 6500,
-    era: 'Modern',
-    requires: {OR: ['Refrigeration', 'Computers']},
+    cost: 6500, era: 'Modern', requires: {OR: ['Refrigeration', 'Computers']},
   },
   'Future Tech': {
-    cost: 8000,
-    era: 'Modern',
-    requires: {AND: ['Composites', 'Genetics']},
+    cost: 8000, era: 'Modern', requires: {AND: ['Composites', 'Genetics']},
   },
 };
 
