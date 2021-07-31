@@ -1,5 +1,5 @@
 import techs from './data/techs.js';
-import Grid from './grid/Grid.js';
+import Grid from './game-objects/Grid.js';
 
 console.log('techs:', techs);
 window.techs = techs;
