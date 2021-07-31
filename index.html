@@ -1,10 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8">
   <title>Koko Civ</title>
-  <link rel="stylesheet" type="text/css" href="css/common.css">
-  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <link rel="preload" href="style.css" as="style">
+  <style>
+    body {
+      background-color: #000;
+      font-family: Arial, sans-serif;
+    }
+    #loading {
+      align-items: center;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      font-size: 32px;
+      left: 50vw;
+      position: fixed;
+      top: 50vh;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+    }
+    #progress-bar {
+      margin-top: 8px;
+      padding: 1px;
+      border: 2px solid #fff;
+      height: 32px;
+      width: 320px;
+    }
+    #progress-bar > div {
+      background-color: #fff;
+      height: 100%;
+    }
+  </style>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
 </head>
 <body>
@@ -15,30 +43,29 @@
     </div>
   </div>
 
-  <div id="backdrop" class="ui" style="display: none;"></div>
-
-  <div id="gameboard" style="display: none;"></div>
-
   <div style="display: none;" id="images">
-    <img src="images/grassland.png" id="grassland">
-    <img src="images/plains.png" id="plains">
-    <img src="images/coast.png" id="coast">
-    <img src="images/sea.png" id="sea">
-    <img src="images/ocean.png" id="ocean">
-    <img src="images/mountain.png" id="mountain">
-    <img src="images/scout.png" id="scout">
-    <img src="images/settler.png" id="settler">
+    <!-- <img src="images/terrain/grassland.png"> -->
+    <!-- <img src="images/terrain/plains.png"> -->
+    <!-- <img src="images/terrain/coast.png"> -->
+    <!-- <img src="images/terrain/sea.png"> -->
+    <!-- <img src="images/terrain/ocean.png"> -->
+    <!-- <img src="images/terrain/mountain.png"> -->
+    <!-- <img src="images/units/scout.png"> -->
+    <!-- <img src="images/units/settler.png"> -->
   </div>
-  <script type="module" src="main.js"></script>
 
-  <!-- Animate the progress bar for the initial load. -->
+  <canvas id="map"></canvas>
+
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="main.js" async="true"></script>
+
   <script>
     (() => {
       const progressEl = document.querySelector('#progress-bar > div');
-      const asyncEls = document.querySelectorAll('script[src], img[src]');
+      const asyncEls = document.querySelectorAll('img[src], link[rel="stylesheet"], script[src]');
       let count = 0;
-      for (const img of asyncEls) {
-        img.onload = () => {
+      for (const el of asyncEls) {
+        el.onload = () => {
           progressEl.style.width = (++count / asyncEls.length) * 100 + '%';
         };
       }

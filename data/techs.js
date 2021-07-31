@@ -303,3 +303,12 @@ const techs = {
 };
 
 export default techs;
+
+// Make sure that all requiremented techs are also defined:
+// function isValid(r) {
+//   return r === null || ((typeof r === 'string') && (r in techs)) ||
+//       ((typeof r === 'object') &&
+//        ((r.OR && r.OR.every(isValid)) || (r.AND && r.AND.every(isValid)) ||
+//         (r.NOT && isValid(r.NOT))));
+// }
+// Object.entries(techs).filter(([n, s]) => !isValid(s.requires));
