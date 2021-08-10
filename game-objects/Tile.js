@@ -4,11 +4,10 @@ const PROP_TO_JSON = {
   canSee: Array.from,
 };
 
-const newSet = arr => new Set(arr);
 const PROP_FROM_JSON = {
-  units: newSet,
-  hasSeen: newSet,
-  canSee: newSet,
+  units: arr => new Set(arr),
+  hasSeen: arr => new Set(arr),
+  canSee: arr => new Set(arr),
 };
 
 const DEFAULT_JSON = {
@@ -18,15 +17,21 @@ const DEFAULT_JSON = {
   canSee: [],
 };
 
-export default class Tile {
-  constructor(json = DEFAULT_JSON) {
-    for (let key in json) {
-      const value = json[key];
-      this[key] = key in PROP_FROM_JSON ? PROP_FROM_JSON[key](value) : value;
-    }
+/**
+ * All data for one tile of the game board.
+ *   terrain: The underlaying geographical features.
+ *   units: The list of units occupying the tile.
+ *   hasSeen: The indexes of the players who have seen the tile.
+ *   canSee: The indexes of the players who can currently see the tile.
+ */
+export default function Tile(json = DEFAULT_JSON) {
+  for (let key in json) {
+    const value = json[key];
+    this[key] = key in PROP_FROM_JSON ? PROP_FROM_JSON[key](value) : value;
   }
 }
 
+/** For use by JSON.stringify(). */
 Tile.prototype.toJSON = function() {
   const json = {};
   for (let key in this) {
@@ -35,3 +40,6 @@ Tile.prototype.toJSON = function() {
   }
   return json;
 };
+
+/** Inverse of toJSON. */
+Tile.fromJSON = (json) => new Tile(json);
